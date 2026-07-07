@@ -46,6 +46,15 @@
     #siteContent.locked { filter: blur(8px); pointer-events: none; user-select: none; }
     .type-line::after { content:"▋"; animation: caret 1s steps(2) infinite; }
     @keyframes caret { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+    #advice { cursor: pointer; }
+    #advice:hover { background: #1a1a1a; }
+    #speedImageContainer {
+      animation: popIn 0.4s ease forwards;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body class="min-h-screen relative scanlines">
@@ -91,6 +100,7 @@
         <a href="#skills" class="game-btn px-4 py-2">SKILLS</a>
         <a href="#projects" class="game-btn px-4 py-2">QUESTS</a>
         <a href="#arcade" class="game-btn px-4 py-2">ARCADE</a>
+        <a href="#advice" class="game-btn px-4 py-2">ADVICE</a>
         <a href="#contact" class="game-btn px-4 py-2">CONNECT</a>
       </nav>
     </div>
@@ -196,6 +206,47 @@
     </div>
   </section>
 
+  <!-- ================= SPEED'S WISDOM (IShowSpeed) ================= -->
+  <section id="advice" class="section py-20 bg-black/90 border-t border-[#00ff9f]/30">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h2 class="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-4">
+        <span class="text-4xl">🎮</span> SPEED'S WISDOM
+      </h2>
+      <hr class="hr-neon mb-10">
+      
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-[#111] border-2 border-[#00ff9f]/60 rounded-2xl p-10 card-glow">
+          <p class="text-xl md:text-2xl leading-relaxed text-[#00ff9f]/90 mb-8">
+            "Bark twice if you're stuck in a bug.<br>
+            Keep grinding. Keep moving.<br>
+            And never forget to chase the bag (your dreams)."
+          </p>
+
+          <button onclick="playBark()" 
+                  class="game-btn px-10 py-5 text-xl font-bold flex items-center gap-3 mx-auto">
+            <i class="fas fa-volume-up"></i>
+            WISDOM
+          </button>
+
+
+          <!-- IShowSpeed Image -->
+          <div id="speedImageContainer" class="hidden mt-8 justify-center">
+            <div class="relative inline-block">
+              <img id="speedImage" 
+                   src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/IShowSpeed_2023.jpg/440px-IShowSpeed_2023.jpg" 
+                   alt="IShowSpeed the Streamer" 
+                   class="rounded-2xl border-4 border-[#00ff9f] shadow-[0_0_40px_#00ff9f] w-72 h-72 object-cover">
+              
+              <div class="absolute -top-4 -right-4 bg-black border-2 border-[#00ff9f] px-4 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+                SPEED
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="contact" class="section py-20 bg-black/90">
     <div class="max-w-4xl mx-auto px-6 text-center">
       <h2 class="text-4xl md:text-5xl font-bold mb-10">🎮 READY TO TEAM UP?</h2>
@@ -208,10 +259,16 @@
     </div>
   </section>
 
-  </div><!-- /siteContent -->
+  </div>
+
+  <!-- ================= AUDIO ================= -->
+  <audio id="speedBark" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/296/296-preview.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <script>
-    /* ================= ROBOT VERIFICATION GATE (MODIFIED) ================= */
+    /* ================= ROBOT VERIFICATION GATE ================= */
     const gate = document.getElementById('gate');
     const siteContent = document.getElementById('siteContent');
     const botLog = document.getElementById('botLog');
@@ -248,14 +305,12 @@
       botSay(val || '(empty)', 'YOU');
 
       if (parseInt(val) === answer) {
-        // Correct answer → DENY access (troll mode)
         gateMsg.className = 'text-center text-sm mt-4 text-red-400';
         gateMsg.textContent = '❌ Bots know basic math. Try again, human.';
         botLog.classList.add('shake'); setTimeout(()=>botLog.classList.remove('shake'),400);
         botSay("Too perfect. Only humans make mistakes here.");
         document.getElementById('puzzleInput').value = '';
       } else {
-        // Wrong answer → GRANT access
         gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
         gateMsg.textContent = '✅ Interesting... You might actually be human.';
         botSay("Wrong answer. That's more human than I expected. Welcome in! 🎮");
@@ -269,6 +324,42 @@
         }, 900);
       }
     }
+
+    /* ================= SPEED (IShowSpeed) BARK + IMAGE ================= */
+    function playBark() {
+      const audio = document.getElementById('speedBark');
+      const container = document.getElementById('speedImageContainer');
+      const img = document.getElementById('speedImage');
+
+      // Show Speed's image
+      container.classList.remove('hidden');
+      container.classList.add('flex');
+
+      // Play barking sound
+      audio.currentTime = 0;
+      audio.play().catch(() => {
+        console.log("Audio playback blocked by browser");
+      });
+
+      // Add shake animation
+      img.classList.add('shake');
+      setTimeout(() => {
+        img.classList.remove('shake');
+      }, 700);
+
+      // Hide image after 4.5 seconds
+      setTimeout(() => {
+        container.classList.remove('flex');
+        container.classList.add('hidden');
+      }, 4500);
+    }
+
+    // Click anywhere on Advice section to trigger bark + image
+    document.getElementById('advice').addEventListener('click', function(e) {
+      if (!e.target.closest('button')) {
+        playBark();
+      }
+    });
 
     /* ================= UPGRADED SNAKE GAME ================= */
     const canvas = document.getElementById('snakeCanvas');
@@ -285,12 +376,9 @@
     let gameOverFlag = false;
     let lastTime = 0;
     let moveTimer = 0;
-    const moveInterval = 130; // ms between moves
+    const moveInterval = 130;
 
-    // Particles
     let particles = [];
-
-    // Touch
     let touchStartX = 0, touchStartY = 0;
 
     const scoreEl = document.getElementById('score');
@@ -300,8 +388,7 @@
     function createParticles(x, y, count = 12, color = '#00ff9f') {
       for (let i = 0; i < count; i++) {
         particles.push({
-          x: x,
-          y: y,
+          x: x, y: y,
           vx: (Math.random() - 0.5) * 6,
           vy: (Math.random() - 0.5) * 6,
           life: 25 + Math.random() * 15,
@@ -314,10 +401,8 @@
     function updateParticles() {
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.96;
-        p.vy *= 0.96;
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= 0.96; p.vy *= 0.96;
         p.life--;
         if (p.life <= 0) particles.splice(i, 1);
       }
@@ -339,7 +424,6 @@
       ctx.strokeStyle = 'rgba(0, 255, 159, 0.15)';
       ctx.lineWidth = 1;
       
-      // Static grid
       for (let x = 0; x <= gridSize; x++) {
         ctx.beginPath();
         ctx.moveTo(x * tileSize, 0);
@@ -353,7 +437,6 @@
         ctx.stroke();
       }
 
-      // Subtle animated scanlines
       const time = Date.now() / 800;
       ctx.strokeStyle = `rgba(0, 255, 159, ${0.08 + Math.sin(time) * 0.04})`;
       ctx.lineWidth = 2;
@@ -369,14 +452,11 @@
     function draw() {
       ctx.fillStyle = '#0a0a0a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       drawCyberpunkGrid();
 
-      // Draw snake with neon glow + trail
       ctx.shadowColor = '#00ff9f';
       ctx.shadowBlur = 15;
 
-      // Motion trail (fading previous positions)
       for (let i = snake.length - 1; i >= 0; i--) {
         const seg = snake[i];
         const alpha = 0.3 + (i / snake.length) * 0.5;
@@ -384,42 +464,31 @@
         ctx.fillRect(seg.x * tileSize + 1, seg.y * tileSize + 1, tileSize - 2, tileSize - 2);
       }
 
-      // Main snake body
       ctx.fillStyle = '#00ff9f';
       for (let i = 1; i < snake.length; i++) {
         const seg = snake[i];
         ctx.fillRect(seg.x * tileSize + 2, seg.y * tileSize + 2, tileSize - 4, tileSize - 4);
       }
 
-      // Animated glowing head with pulse
       const head = snake[0];
-      const pulse = Math.sin(Date.now() / 180) * 2 + 3;
       ctx.shadowBlur = 25;
       ctx.fillStyle = '#00ff9f';
       ctx.fillRect(head.x * tileSize + 1, head.y * tileSize + 1, tileSize - 2, tileSize - 2);
 
-      // Head highlight
       ctx.fillStyle = '#ffffff';
       ctx.globalAlpha = 0.6;
       ctx.fillRect(head.x * tileSize + 4, head.y * tileSize + 4, tileSize - 10, tileSize - 10);
       ctx.globalAlpha = 1;
-
       ctx.shadowBlur = 0;
 
-      // Draw food (animated glowing apple)
       const foodPulse = Math.sin(Date.now() / 200) * 3 + 8;
       ctx.shadowColor = '#ff00ff';
       ctx.shadowBlur = 20;
       ctx.fillStyle = '#ff00ff';
       ctx.beginPath();
-      ctx.arc(
-        food.x * tileSize + tileSize / 2, 
-        food.y * tileSize + tileSize / 2, 
-        foodPulse, 0, Math.PI * 2
-      );
+      ctx.arc(food.x * tileSize + tileSize / 2, food.y * tileSize + tileSize / 2, foodPulse, 0, Math.PI * 2);
       ctx.fill();
 
-      // Food core
       ctx.shadowBlur = 8;
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
@@ -427,7 +496,6 @@
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Draw particles
       drawParticles();
     }
 
@@ -436,41 +504,30 @@
 
       const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-      // Wall collision
       if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
-        endGame();
-        return;
+        endGame(); return;
       }
 
-      // Self collision
       for (let i = 0; i < snake.length; i++) {
         if (snake[i].x === head.x && snake[i].y === head.y) {
-          endGame();
-          return;
+          endGame(); return;
         }
       }
 
       snake.unshift(head);
 
-      // Eat food
       if (head.x === food.x && head.y === food.y) {
         score += 10;
         scoreEl.textContent = String(score).padStart(3, '0');
         
-        createParticles(
-          food.x * tileSize + tileSize / 2, 
-          food.y * tileSize + tileSize / 2, 
-          18, '#ff00ff'
-        );
+        createParticles(food.x * tileSize + tileSize / 2, food.y * tileSize + tileSize / 2, 18, '#ff00ff');
         
-        // Respawn food
         do {
           food = {
             x: Math.floor(Math.random() * gridSize),
             y: Math.floor(Math.random() * gridSize)
           };
         } while (snake.some(seg => seg.x === food.x && seg.y === food.y));
-
       } else {
         snake.pop();
       }
@@ -497,13 +554,8 @@
     function endGame() {
       gameOverFlag = true;
       
-      // Explosion effect
       const head = snake[0];
-      createParticles(
-        head.x * tileSize + tileSize / 2, 
-        head.y * tileSize + tileSize / 2, 
-        35, '#ff3333'
-      );
+      createParticles(head.x * tileSize + tileSize / 2, head.y * tileSize + tileSize / 2, 35, '#ff3333');
 
       if (score > highScore) {
         highScore = score;
@@ -516,8 +568,7 @@
 
     function resetGame() {
       snake = [{ x: 10, y: 10 }];
-      dx = 1;
-      dy = 0;
+      dx = 1; dy = 0;
       score = 0;
       scoreEl.textContent = '000';
       food = { x: 15, y: 15 };
@@ -535,7 +586,6 @@
       document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE';
     }
 
-    // Leaderboard functions (unchanged)
     function getLocalScores() {
       return JSON.parse(localStorage.getItem('snakeLocalScores')) || [];
     }
@@ -566,7 +616,6 @@
       container.innerHTML = html;
     }
 
-    // Keyboard controls
     document.addEventListener('keydown', e => {
       if (gameOverFlag) return;
       let prevent = false;
@@ -586,7 +635,6 @@
       if (prevent) e.preventDefault();
     });
 
-    // Improved Mobile Swipe Controls (prevents page scroll)
     canvas.addEventListener('touchstart', e => {
       e.preventDefault();
       touchStartX = e.changedTouches[0].screenX;
@@ -609,16 +657,14 @@
       }
     }, { passive: false });
 
-    // Initialize everything
+    /* ================= INITIALIZE EVERYTHING ================= */
     function initGame() {
       resetGame();
       renderLeaderboard(getLocalScores());
       document.getElementById('year').textContent = new Date().getFullYear();
 
-      // Start 60fps game loop
       requestAnimationFrame(gameLoop);
 
-      // Section animations
       document.querySelectorAll('.section').forEach(sec => {
         new IntersectionObserver((entries) => {
           if (entries[0].isIntersecting) sec.classList.add('visible');
