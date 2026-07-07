@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAFIL RAZAK // LEVEL 01</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff9f; overflow-x: hidden; }
+
+    /* Nebula Animated Background */
+    .nebula-bg {
+      position: fixed;
+      top: -20%; left: -20%; right: -20%; bottom: -20%;
+      z-index: -1;
+      background: url('https://mymythos.org/wp-content/uploads/2025/10/The-Nebula-Archetype-Featured-scaled.webp') center/cover no-repeat;
+      animation: nebulaZoom 45s ease-in-out infinite alternate;
+      filter: brightness(0.7) contrast(1.15) saturate(1.3);
+    }
+
+    @keyframes nebulaZoom {
+      0% { transform: scale(1) rotate(0deg); }
+      100% { transform: scale(1.15) rotate(2deg); }
+    }
+
+    .neon-text { text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f; }
+    
+    .game-btn {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #111;
+      border: 2px solid #00ff9f;
+      color: #00ff9f;
+    }
+    .game-btn:hover {
+      transform: scale(1.08) translateY(-3px);
+      box-shadow: 0 0 30px #00ff9f;
+      background: #1a1a1a;
+      color: #ffffff;
+      border-color: #ffffff;
+    }
+    .section { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
+    .section.visible { opacity: 1; transform: translateY(0); }
+    canvas { border: 4px solid #00ff9f; image-rendering: pixelated; box-shadow: 0 0 30px #00ff9f; }
+  </style>
+</head>
+<body class="min-h-screen relative">
+
+  <!-- Nebula Background -->
+  <div class="nebula-bg"></div>
+
+  <!-- HEADER -->
+  <header class="border-b border-[#00ff9f] bg-black/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🕹️</span>
+        <h1 class="text-2xl font-bold neon-text">HAFIL RAZAK</h1>
+      </div>
+      <nav class="flex gap-6 text-sm">
+        <a href="#about" class="hover:text-white transition game-btn px-4 py-2 rounded">ABOUT</a>
+        <a href="#skills" class="hover:text-white transition game-btn px-4 py-2 rounded">SKILLS</a>
+        <a href="#projects" class="hover:text-white transition game-btn px-4 py-2 rounded">QUESTS</a>
+        <a href="#arcade" class="hover:text-white transition game-btn px-4 py-2 rounded">ARCADE</a>
+        <a href="#contact" class="hover:text-white transition game-btn px-4 py-2 rounded">CONNECT</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="min-h-screen flex items-center justify-center relative">
+    <div class="text-center px-6 max-w-4xl z-10">
+      <h1 class="text-7xl md:text-8xl font-bold mb-4 neon-text">HAFIL RAZAK</h1>
+      <p class="text-3xl text-[#00ff9f]/80 mb-10">COMPUTER SCIENCE STUDENT • CODE WARRIOR</p>
+      <div class="flex flex-wrap justify-center gap-6">
+        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg">GITHUB</a>
+        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg font-bold">LINKEDIN</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section py-20 bg-black/90 border-t border-[#00ff9f]/30">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-5xl font-bold mb-10 flex items-center gap-4"><span class="text-4xl">📍</span> MISSION BRIEF</h2>
+      <div class="grid md:grid-cols-2 gap-12">
+        <div>
+          <p class="text-lg leading-relaxed text-[#00ff9f]/90">Passionate Computer Science student from India building real-world solutions through code.</p>
+        </div>
+        <div class="bg-[#111] p-8 border border-[#00ff9f]/50">
+          <h3 class="text-xl mb-6 text-white">CURRENT STATUS</h3>
+          <ul class="space-y-4">
+            <li class="flex justify-between"><span>BASE</span><span class="text-white">India</span></li>
+            <li class="flex justify-between"><span>BRANCH</span><span class="text-white">Computer Science</span></li>
+            <li class="flex justify-between"><span>MAIN QUEST</span><span class="text-white">Software Engineering</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="section py-20 bg-[#0a0a0a]">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-5xl font-bold mb-12 text-center">🛠️ POWER-UPS</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🐍 Python</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">☕ Java</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🌐 JS/React</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🗄️ SQL</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">📡 Node.js</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">⚡ Tailwind</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🔧 Git</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🧠 DSA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="section py-20 bg-black/90 border-t border-[#00ff9f]/30">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-5xl font-bold mb-12">📜 ACTIVE QUESTS</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+          <h3 class="text-2xl font-bold mb-3">Pet health AI</h3>
+          <a href="https://github.com/hafilrazz/pet-AI" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+        </div>
+        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+          <h3 class="text-2xl font-bold mb-3">Neurolense</h3>
+          <a href="https://github.com/hafilrazz/neurolense" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+        </div>
+        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+          <h3 class="text-2xl font-bold mb-3">Net2bot</h3>
+          <a href="https://github.com/hafilrazz/Net2bot" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+        </div>
+        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+          <h3 class="text-2xl font-bold mb-3">Full-Stack Chat App</h3>
+          <a href="https://github.com/hafilrazz/full-stack_chatApp" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCADE -->
+  <section id="arcade" class="section py-20 bg-[#0a0a0a] border-t border-[#00ff9f]/30">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-12">
+        <div class="text-center">
+          <h2 class="text-5xl font-bold mb-6">🎮 RETRO ARCADE</h2>
+          <div class="flex justify-center gap-8 mb-6">
+            <div>SCORE <span id="score" class="font-bold text-white">000</span></div>
+            <div>HIGH <span id="highscore" class="font-bold text-white">000</span></div>
+          </div>
+          <canvas id="snakeCanvas" width="400" height="400" class="mx-auto"></canvas>
+          <div class="mt-8 flex gap-4 justify-center">
+            <button onclick="togglePause()" id="pauseBtn" class="game-btn px-8 py-3">PAUSE</button>
+            <button onclick="resetGame()" class="game-btn px-8 py-3">RESTART</button>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-5xl font-bold mb-6 text-center">🏆 HALL OF FAME</h2>
+          <div id="leaderboard" class="bg-black border border-[#00ff9f]/50 p-6 text-left max-h-96 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section py-20 bg-black/90">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-5xl font-bold mb-10">🎮 READY TO TEAM UP?</h2>
+      <div class="flex justify-center gap-8 text-4xl mb-10">
+        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Retro Sounds + Snake Game (same)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq, duration, type = 'square', vol = 0.3) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.value = vol;
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      setTimeout(() => osc.stop(), duration);
+    }
+    function soundEat() { playBeep(800,80,'sawtooth',0.4); playBeep(1200,60,'sine',0.3); }
+    function soundGameOver() { playBeep(200,600,'sawtooth',0.5); }
+    function soundMove() { playBeep(600,20,'square',0.1); }
+
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const grid = 20;
+    let snake = [{x:10,y:10}], dx=1, dy=0, food={x:15,y:15}, score=0, gameInterval, paused=false, gameOverFlag=false;
+
+    const highScoreEl = document.getElementById('highscore');
+    let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+    highScoreEl.textContent = String(highScore).padStart(3,'0');
+
+    let touchStartX=0, touchStartY=0;
+
+    function draw() {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#00ff9f';
+      snake.forEach(s => ctx.fillRect(s.x*grid, s.y*grid, grid-2, grid-2));
+      ctx.fillStyle = '#ff00ff';
+      ctx.fillRect(food.x*grid, food.y*grid, grid-2, grid-2);
+    }
+
+    function move() {
+      if (paused || gameOverFlag) return;
+      soundMove();
+      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+      if (head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)) {
+        soundGameOver(); endGame(); return;
+      }
+      snake.unshift(head);
+      if (head.x===food.x && head.y===food.y) {
+        score += 10;
+        document.getElementById('score').textContent = String(score).padStart(3,'0');
+        soundEat();
+        food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
+      } else snake.pop();
+      draw();
+    }
+
+    function endGame() {
+      gameOverFlag = true;
+      clearInterval(gameInterval);
+      if (score > 0 && score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+        highScoreEl.textContent = String(highScore).padStart(3,'0');
+      }
+      if (score > 0) updateLeaderboard();
+    }
+
+    function resetGame() {
+      snake = [{x:10,y:10}]; dx=1; dy=0; score=0;
+      document.getElementById('score').textContent = '000';
+      food = {x:15,y:15}; gameOverFlag=false; paused=false;
+      clearInterval(gameInterval);
+      gameInterval = setInterval(move, 110);
+      draw();
+    }
+
+    function togglePause() {
+      paused = !paused;
+      document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE';
+    }
+
+    function getLocalScores() { return JSON.parse(localStorage.getItem('snakeLocalScores')) || []; }
+
+    function updateLeaderboard() {
+      let scores = getLocalScores();
+      if (score > 0) scores.push({score: score, date: new Date().toLocaleDateString()});
+      scores.sort((a,b) => b.score - a.score);
+      scores = scores.slice(0, 8);
+      localStorage.setItem('snakeLocalScores', JSON.stringify(scores));
+      renderLeaderboard(scores);
+    }
+
+    function renderLeaderboard(scores) {
+      const container = document.getElementById('leaderboard');
+      let html = '<div class="space-y-3 text-sm">';
+      if (scores.length === 0) {
+        html += '<p class="opacity-60 text-center py-8">Play some games to fill the hall of fame!</p>';
+      } else {
+        scores.forEach((entry, i) => {
+          html += `
+            <div class="flex justify-between px-4 py-3 border-b border-[#00ff9f]/30">
+              <span>#${i+1} ${entry.date}</span>
+              <span class="font-bold">${String(entry.score).padStart(3,'0')}</span>
+            </div>`;
+        });
+      }
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Controls
+    document.addEventListener('keydown', e => {
+      if (gameOverFlag) return;
+      let prevent = false;
+      switch(e.key) {
+        case 'ArrowUp': case 'w': case 'W': if(dy!==1){dx=0;dy=-1} prevent=true; break;
+        case 'ArrowDown': case 's': case 'S': if(dy!==-1){dx=0;dy=1} prevent=true; break;
+        case 'ArrowLeft': case 'a': case 'A': if(dx!==1){dx=-1;dy=0} prevent=true; break;
+        case 'ArrowRight': case 'd': case 'D': if(dx!==-1){dx=1;dy=0} prevent=true; break;
+        case ' ': togglePause(); prevent=true; break;
+      }
+      if (prevent) e.preventDefault();
+    });
+
+    canvas.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; });
+    canvas.addEventListener('touchend', e => {
+      if (gameOverFlag) return;
+      const deltaX = e.changedTouches[0].screenX - touchStartX;
+      const deltaY = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 30 && dx !== -1) { dx = 1; dy = 0; }
+        else if (deltaX < -30 && dx !== 1) { dx = -1; dy = 0; }
+      } else {
+        if (deltaY > 30 && dy !== -1) { dx = 0; dy = 1; }
+        else if (deltaY < -30 && dy !== 1) { dx = 0; dy = -1; }
+      }
+    });
+
+    // Init
+    resetGame();
+    renderLeaderboard(getLocalScores());
+
+    document.querySelectorAll('.section').forEach(sec => {
+      new IntersectionObserver((e) => e[0].isIntersecting && sec.classList.add('visible'), {threshold: 0.1}).observe(sec);
+    });
+  </script>
+</body>
+  </html>
