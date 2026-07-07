@@ -29,7 +29,7 @@
     .game-btn:hover { transform: scale(1.08) translateY(-3px); box-shadow: 0 0 30px #00ff9f; background: #1a1a1a; color: #fff; border-color: #fff; }
     .section { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
     .section.visible { opacity: 1; transform: translateY(0); }
-    canvas { border: 4px solid #00ff9f; image-rendering: pixelated; box-shadow: 0 0 30px #00ff9f; border-radius: 6px; }
+    canvas { border: 4px solid #00ff9f; image-rendering: pixelated; box-shadow: 0 0 30px #00ff9f; border-radius: 6px; touch-action: none; }
     .card-glow { transition: all .3s ease; }
     .card-glow:hover { box-shadow: 0 0 25px rgba(0,255,159,.35); transform: translateY(-4px); }
     .hr-neon { height: 2px; background: linear-gradient(90deg, transparent, #00ff9f, transparent); border: 0; }
@@ -71,22 +71,6 @@
                  class="flex-1 bg-black border-2 border-[#00ff9f]/60 rounded-lg px-4 py-3 text-white focus:border-[#00ff9f] focus:outline-none">
           <button id="puzzleBtn" class="game-btn px-6 py-3 font-bold">VERIFY</button>
         </div>
-      </div>
-
-      <div id="step2" class="hidden">
-        <label class="block mb-2 text-[#00ff9f]/80">ENTER YOUR INSTAGRAM HANDLE (OPTIONAL):</label>
-        <div class="flex gap-3">
-          <div class="flex-1 flex items-center bg-black border-2 border-[#00ff9f]/60 rounded-lg px-3 focus-within:border-[#00ff9f]">
-            <span class="text-[#00ff9f]/60">@</span>
-            <input id="igInput" type="text" placeholder="your_username"
-                   class="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none">
-          </div>
-          <button id="igBtn" class="game-btn px-6 py-3 font-bold">ENTER</button>
-        </div>
-        <button id="skipBtn" class="text-xs text-[#00ff9f]/50 mt-3 underline hover:text-[#00ff9f]">Skip &amp; enter site →</button>
-        <p class="text-[10px] text-[#00ff9f]/40 mt-2 leading-relaxed">
-          * Optional. Format is validated locally — nothing is stored or sent anywhere.
-        </p>
       </div>
 
       <p id="gateMsg" class="text-center text-sm mt-4 min-h-[1.2rem]"></p>
@@ -227,7 +211,7 @@
   </div><!-- /siteContent -->
 
   <script>
-    /* ================= ROBOT VERIFICATION GATE ================= */
+    /* ================= ROBOT VERIFICATION GATE (MODIFIED) ================= */
     const gate = document.getElementById('gate');
     const siteContent = document.getElementById('siteContent');
     const botLog = document.getElementById('botLog');
@@ -246,23 +230,15 @@
       botLog.scrollTop = botLog.scrollHeight;
     }
 
-    let answer = 0;
+    let answer = 2;
+
     function makePuzzle() {
-      const a = Math.floor(Math.random()*8)+2, b = Math.floor(Math.random()*8)+2;
-      const ops = [
-        {q:`What is ${a} + ${b}?`, r:a+b},
-        {q:`What is ${a} × ${b}?`, r:a*b},
-        {q:`How many letters are in the word "HUMAN"?`, r:5},
-        {q:`Type the number ${a}${b} backwards.`, r:parseInt((''+a+b).split('').reverse().join(''))},
-      ];
-      const p = ops[Math.floor(Math.random()*ops.length)];
-      answer = p.r;
-      document.getElementById('puzzleQ').textContent = p.q;
-      return p.q;
+      document.getElementById('puzzleQ').textContent = "What is 1 + 1?";
+      answer = 2;
     }
 
     setTimeout(()=>botSay("Hello, traveler. I must confirm you're human. 🤖"), 400);
-    setTimeout(()=>{ const q = makePuzzle(); botSay(q); }, 1400);
+    setTimeout(()=>{ makePuzzle(); botSay("What is 1 + 1?"); }, 1400);
 
     document.getElementById('puzzleBtn').addEventListener('click', checkPuzzle);
     document.getElementById('puzzleInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPuzzle(); });
@@ -270,153 +246,387 @@
     function checkPuzzle() {
       const val = document.getElementById('puzzleInput').value.trim();
       botSay(val || '(empty)', 'YOU');
+
       if (parseInt(val) === answer) {
-        gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
-        gateMsg.textContent = '✅ Human confirmed!';
-        botSay("Correct! One last (optional) step...");
-        document.getElementById('step1').classList.add('hidden');
-        document.getElementById('step2').classList.remove('hidden');
-        setTimeout(()=>botSay("Optionally, share your Instagram handle — or just skip it."), 500);
-        document.getElementById('igInput').focus();
-      } else {
+        // Correct answer → DENY access (troll mode)
         gateMsg.className = 'text-center text-sm mt-4 text-red-400';
-        gateMsg.textContent = '❌ Wrong answer, try again.';
+        gateMsg.textContent = '❌ Bots know basic math. Try again, human.';
         botLog.classList.add('shake'); setTimeout(()=>botLog.classList.remove('shake'),400);
-        botSay("That doesn't look right. Here's a new one:");
-        setTimeout(()=>{ const q = makePuzzle(); botSay(q); }, 400);
+        botSay("Too perfect. Only humans make mistakes here.");
         document.getElementById('puzzleInput').value = '';
+      } else {
+        // Wrong answer → GRANT access
+        gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
+        gateMsg.textContent = '✅ Interesting... You might actually be human.';
+        botSay("Wrong answer. That's more human than I expected. Welcome in! 🎮");
+        
+        sessionStorage.setItem('humanVerified', 'true');
+        setTimeout(() => {
+          gate.style.transition = 'opacity 0.6s';
+          gate.style.opacity = '0';
+          siteContent.classList.remove('locked');
+          setTimeout(()=> gate.classList.add('gate-hidden'), 600);
+        }, 900);
       }
     }
 
-    document.getElementById('igBtn').addEventListener('click', checkIG);
-    document.getElementById('igInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkIG(); });
-    document.getElementById('skipBtn').addEventListener('click', ()=> finishVerification("Skipped — welcome in! 🎮"));
+    /* ================= UPGRADED SNAKE GAME ================= */
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const gridSize = 20;
+    const tileSize = canvas.width / gridSize;
 
-    function checkIG() {
-      let handle = document.getElementById('igInput').value.trim().replace(/^@/, '');
-      botSay('@' + (handle || '(empty)'), 'YOU');
+    let snake = [{x: 10, y: 10}];
+    let dx = 1, dy = 0;
+    let food = {x: 15, y: 15};
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+    let paused = false;
+    let gameOverFlag = false;
+    let lastTime = 0;
+    let moveTimer = 0;
+    const moveInterval = 130; // ms between moves
 
-      if (!handle) { finishVerification("No handle given — that's okay. Welcome in! 🎮"); return; }
+    // Particles
+    let particles = [];
 
-      const valid = /^(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]{1,30}$/.test(handle);
-      if (!valid) {
-        gateMsg.className = 'text-center text-sm mt-4 text-red-400';
-        gateMsg.textContent = '❌ That is not a valid Instagram handle format.';
-        botLog.classList.add('shake'); setTimeout(()=>botLog.classList.remove('shake'),400);
-        botSay("That handle format isn't valid (letters, numbers, '.' and '_' only). Try again — or skip.");
+    // Touch
+    let touchStartX = 0, touchStartY = 0;
+
+    const scoreEl = document.getElementById('score');
+    const highScoreEl = document.getElementById('highscore');
+    highScoreEl.textContent = String(highScore).padStart(3, '0');
+
+    function createParticles(x, y, count = 12, color = '#00ff9f') {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6,
+          life: 25 + Math.random() * 15,
+          color: color,
+          size: 2 + Math.random() * 3
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function drawParticles() {
+      ctx.shadowBlur = 8;
+      for (const p of particles) {
+        const alpha = p.life / 40;
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = alpha;
+        ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    function drawCyberpunkGrid() {
+      ctx.strokeStyle = 'rgba(0, 255, 159, 0.15)';
+      ctx.lineWidth = 1;
+      
+      // Static grid
+      for (let x = 0; x <= gridSize; x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * tileSize, 0);
+        ctx.lineTo(x * tileSize, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= gridSize; y++) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * tileSize);
+        ctx.lineTo(canvas.width, y * tileSize);
+        ctx.stroke();
+      }
+
+      // Subtle animated scanlines
+      const time = Date.now() / 800;
+      ctx.strokeStyle = `rgba(0, 255, 159, ${0.08 + Math.sin(time) * 0.04})`;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const offset = ((time * 40) % (canvas.height * 2)) - canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(0, offset + i * 30);
+        ctx.lineTo(canvas.width, offset + i * 30);
+        ctx.stroke();
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawCyberpunkGrid();
+
+      // Draw snake with neon glow + trail
+      ctx.shadowColor = '#00ff9f';
+      ctx.shadowBlur = 15;
+
+      // Motion trail (fading previous positions)
+      for (let i = snake.length - 1; i >= 0; i--) {
+        const seg = snake[i];
+        const alpha = 0.3 + (i / snake.length) * 0.5;
+        ctx.fillStyle = `rgba(0, 255, 159, ${alpha})`;
+        ctx.fillRect(seg.x * tileSize + 1, seg.y * tileSize + 1, tileSize - 2, tileSize - 2);
+      }
+
+      // Main snake body
+      ctx.fillStyle = '#00ff9f';
+      for (let i = 1; i < snake.length; i++) {
+        const seg = snake[i];
+        ctx.fillRect(seg.x * tileSize + 2, seg.y * tileSize + 2, tileSize - 4, tileSize - 4);
+      }
+
+      // Animated glowing head with pulse
+      const head = snake[0];
+      const pulse = Math.sin(Date.now() / 180) * 2 + 3;
+      ctx.shadowBlur = 25;
+      ctx.fillStyle = '#00ff9f';
+      ctx.fillRect(head.x * tileSize + 1, head.y * tileSize + 1, tileSize - 2, tileSize - 2);
+
+      // Head highlight
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.6;
+      ctx.fillRect(head.x * tileSize + 4, head.y * tileSize + 4, tileSize - 10, tileSize - 10);
+      ctx.globalAlpha = 1;
+
+      ctx.shadowBlur = 0;
+
+      // Draw food (animated glowing apple)
+      const foodPulse = Math.sin(Date.now() / 200) * 3 + 8;
+      ctx.shadowColor = '#ff00ff';
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = '#ff00ff';
+      ctx.beginPath();
+      ctx.arc(
+        food.x * tileSize + tileSize / 2, 
+        food.y * tileSize + tileSize / 2, 
+        foodPulse, 0, Math.PI * 2
+      );
+      ctx.fill();
+
+      // Food core
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(food.x * tileSize + tileSize / 2, food.y * tileSize + tileSize / 2, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Draw particles
+      drawParticles();
+    }
+
+    function moveSnake() {
+      if (paused || gameOverFlag) return;
+
+      const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+      // Wall collision
+      if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+        endGame();
         return;
       }
 
-      finishVerification(`Nice to meet you, @${handle}! Unlocking the site... 🔓`);
-    }
+      // Self collision
+      for (let i = 0; i < snake.length; i++) {
+        if (snake[i].x === head.x && snake[i].y === head.y) {
+          endGame();
+          return;
+        }
+      }
 
-    function finishVerification(msg) {
-      botSay(msg);
-      gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
-      gateMsg.textContent = '✅ ACCESS GRANTED';
-      sessionStorage.setItem('humanVerified', 'true');
-      setTimeout(() => {
-        gate.style.transition = 'opacity 0.6s';
-        gate.style.opacity = '0';
-        siteContent.classList.remove('locked');
-        setTimeout(()=> gate.classList.add('gate-hidden'), 600);
-      }, 900);
-    }
-
-    /* ================= RETRO SOUNDS + SNAKE GAME ================= */
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, duration, type='square', vol=0.3) {
-      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-      osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.value = vol; osc.connect(gain).connect(audioCtx.destination);
-      osc.start(); setTimeout(() => osc.stop(), duration);
-    }
-    function soundEat() { playBeep(800,80,'sawtooth',0.4); playBeep(1200,60,'sine',0.3); }
-    function soundGameOver() { playBeep(200,600,'sawtooth',0.5); }
-    function soundMove() { playBeep(600,20,'square',0.1); }
-
-    const canvas = document.getElementById('snakeCanvas');
-    const ctx = canvas.getContext('2d');
-    const grid = 20;
-    let snake=[{x:10,y:10}], dx=1, dy=0, food={x:15,y:15}, score=0, gameInterval, paused=false, gameOverFlag=false;
-
-    const highScoreEl = document.getElementById('highscore');
-    let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
-    highScoreEl.textContent = String(highScore).padStart(3,'0');
-
-    let touchStartX=0, touchStartY=0;
-
-    function draw() {
-      ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#00ff9f';
-      snake.forEach(s => ctx.fillRect(s.x*grid, s.y*grid, grid-2, grid-2));
-      ctx.fillStyle = '#ff00ff';
-      ctx.fillRect(food.x*grid, food.y*grid, grid-2, grid-2);
-    }
-    function move() {
-      if (paused || gameOverFlag) return;
-      soundMove();
-      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-      if (head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)) { soundGameOver(); endGame(); return; }
       snake.unshift(head);
-      if (head.x===food.x && head.y===food.y) {
-        score += 10; document.getElementById('score').textContent = String(score).padStart(3,'0');
-        soundEat(); food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
-      } else snake.pop();
-      draw();
+
+      // Eat food
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        scoreEl.textContent = String(score).padStart(3, '0');
+        
+        createParticles(
+          food.x * tileSize + tileSize / 2, 
+          food.y * tileSize + tileSize / 2, 
+          18, '#ff00ff'
+        );
+        
+        // Respawn food
+        do {
+          food = {
+            x: Math.floor(Math.random() * gridSize),
+            y: Math.floor(Math.random() * gridSize)
+          };
+        } while (snake.some(seg => seg.x === food.x && seg.y === food.y));
+
+      } else {
+        snake.pop();
+      }
     }
+
+    function gameLoop(timestamp = 0) {
+      if (!lastTime) lastTime = timestamp;
+      const delta = timestamp - lastTime;
+      lastTime = timestamp;
+
+      if (!paused && !gameOverFlag) {
+        moveTimer += delta;
+        if (moveTimer >= moveInterval) {
+          moveSnake();
+          moveTimer = 0;
+        }
+      }
+
+      updateParticles();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
     function endGame() {
-      gameOverFlag = true; clearInterval(gameInterval);
-      if (score > 0 && score > highScore) { highScore = score; localStorage.setItem('snakeHighScore', highScore); highScoreEl.textContent = String(highScore).padStart(3,'0'); }
+      gameOverFlag = true;
+      
+      // Explosion effect
+      const head = snake[0];
+      createParticles(
+        head.x * tileSize + tileSize / 2, 
+        head.y * tileSize + tileSize / 2, 
+        35, '#ff3333'
+      );
+
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+        highScoreEl.textContent = String(highScore).padStart(3, '0');
+      }
+
       if (score > 0) updateLeaderboard();
     }
+
     function resetGame() {
-      snake=[{x:10,y:10}]; dx=1; dy=0; score=0;
-      document.getElementById('score').textContent = '000';
-      food={x:15,y:15}; gameOverFlag=false; paused=false;
-      clearInterval(gameInterval); gameInterval = setInterval(move, 110); draw();
+      snake = [{ x: 10, y: 10 }];
+      dx = 1;
+      dy = 0;
+      score = 0;
+      scoreEl.textContent = '000';
+      food = { x: 15, y: 15 };
+      gameOverFlag = false;
+      paused = false;
+      particles = [];
+      moveTimer = 0;
+      lastTime = 0;
+      document.getElementById('pauseBtn').textContent = 'PAUSE';
     }
-    function togglePause() { paused = !paused; document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE'; }
-    function getLocalScores() { return JSON.parse(localStorage.getItem('snakeLocalScores')) || []; }
+
+    function togglePause() {
+      if (gameOverFlag) return;
+      paused = !paused;
+      document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE';
+    }
+
+    // Leaderboard functions (unchanged)
+    function getLocalScores() {
+      return JSON.parse(localStorage.getItem('snakeLocalScores')) || [];
+    }
+
     function updateLeaderboard() {
       let scores = getLocalScores();
-      if (score > 0) scores.push({score: score, date: new Date().toLocaleDateString()});
-      scores.sort((a,b) => b.score - a.score); scores = scores.slice(0, 8);
+      scores.push({ score: score, date: new Date().toLocaleDateString() });
+      scores.sort((a, b) => b.score - a.score);
+      scores = scores.slice(0, 8);
       localStorage.setItem('snakeLocalScores', JSON.stringify(scores));
       renderLeaderboard(scores);
     }
+
     function renderLeaderboard(scores) {
       const container = document.getElementById('leaderboard');
       let html = '<div class="space-y-3 text-sm">';
-      if (scores.length === 0) { html += '<p class="opacity-60 text-center py-8">Play some games to fill the hall of fame!</p>'; }
-      else { scores.forEach((entry,i)=>{ html += `<div class="flex justify-between px-4 py-3 border-b border-[#00ff9f]/30"><span>#${i+1} ${entry.date}</span><span class="font-bold">${String(entry.score).padStart(3,'0')}</span></div>`; }); }
-      html += '</div>'; container.innerHTML = html;
+      if (scores.length === 0) {
+        html += '<p class="opacity-60 text-center py-8">Play some games to fill the hall of fame!</p>';
+      } else {
+        scores.forEach((entry, i) => {
+          html += `<div class="flex justify-between px-4 py-3 border-b border-[#00ff9f]/30">
+            <span>#${i+1} ${entry.date}</span>
+            <span class="font-bold">${String(entry.score).padStart(3,'0')}</span>
+          </div>`;
+        });
+      }
+      html += '</div>';
+      container.innerHTML = html;
     }
+
+    // Keyboard controls
     document.addEventListener('keydown', e => {
-      if (gameOverFlag) return; let prevent=false;
-      switch(e.key) {
-        case 'ArrowUp': case 'w': case 'W': if(dy!==1){dx=0;dy=-1} prevent=true; break;
-        case 'ArrowDown': case 's': case 'S': if(dy!==-1){dx=0;dy=1} prevent=true; break;
-        case 'ArrowLeft': case 'a': case 'A': if(dx!==1){dx=-1;dy=0} prevent=true; break;
-        case 'ArrowRight': case 'd': case 'D': if(dx!==-1){dx=1;dy=0} prevent=true; break;
-        case ' ': togglePause(); prevent=true; break;
+      if (gameOverFlag) return;
+      let prevent = false;
+
+      switch (e.key) {
+        case 'ArrowUp': case 'w': case 'W':
+          if (dy !== 1) { dx = 0; dy = -1; } prevent = true; break;
+        case 'ArrowDown': case 's': case 'S':
+          if (dy !== -1) { dx = 0; dy = 1; } prevent = true; break;
+        case 'ArrowLeft': case 'a': case 'A':
+          if (dx !== 1) { dx = -1; dy = 0; } prevent = true; break;
+        case 'ArrowRight': case 'd': case 'D':
+          if (dx !== -1) { dx = 1; dy = 0; } prevent = true; break;
+        case ' ':
+          togglePause(); prevent = true; break;
       }
       if (prevent) e.preventDefault();
     });
-    canvas.addEventListener('touchstart', e => { touchStartX=e.changedTouches[0].screenX; touchStartY=e.changedTouches[0].screenY; });
-    canvas.addEventListener('touchend', e => {
-      if (gameOverFlag) return;
-      const dX = e.changedTouches[0].screenX - touchStartX, dY = e.changedTouches[0].screenY - touchStartY;
-      if (Math.abs(dX) > Math.abs(dY)) { if (dX>30 && dx!==-1){dx=1;dy=0} else if (dX<-30 && dx!==1){dx=-1;dy=0} }
-      else { if (dY>30 && dy!==-1){dx=0;dy=1} else if (dY<-30 && dy!==1){dx=0;dy=-1} }
-    });
 
-    resetGame();
-    renderLeaderboard(getLocalScores());
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.querySelectorAll('.section').forEach(sec => {
-      new IntersectionObserver((e)=> e[0].isIntersecting && sec.classList.add('visible'), {threshold:0.1}).observe(sec);
-    });
+    // Improved Mobile Swipe Controls (prevents page scroll)
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', e => {
+      if (gameOverFlag || paused) return;
+      e.preventDefault();
+
+      const dX = e.changedTouches[0].screenX - touchStartX;
+      const dY = e.changedTouches[0].screenY - touchStartY;
+
+      if (Math.abs(dX) > Math.abs(dY)) {
+        if (dX > 40 && dx !== -1) { dx = 1; dy = 0; }
+        else if (dX < -40 && dx !== 1) { dx = -1; dy = 0; }
+      } else {
+        if (dY > 40 && dy !== -1) { dx = 0; dy = 1; }
+        else if (dY < -40 && dy !== 1) { dx = 0; dy = -1; }
+      }
+    }, { passive: false });
+
+    // Initialize everything
+    function initGame() {
+      resetGame();
+      renderLeaderboard(getLocalScores());
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Start 60fps game loop
+      requestAnimationFrame(gameLoop);
+
+      // Section animations
+      document.querySelectorAll('.section').forEach(sec => {
+        new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) sec.classList.add('visible');
+        }, { threshold: 0.1 }).observe(sec);
+      });
+    }
+
+    initGame();
   </script>
 </body>
 </html>
