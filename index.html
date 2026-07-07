@@ -8,89 +8,133 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     body { font-family: 'Courier New', monospace; background: #0a0a0a; color: #00ff9f; overflow-x: hidden; }
-
-    /* Nebula Animated Background */
     .nebula-bg {
-      position: fixed;
-      top: -20%; left: -20%; right: -20%; bottom: -20%;
-      z-index: -1;
+      position: fixed; top: -20%; left: -20%; right: -20%; bottom: -20%; z-index: -1;
       background: url('https://mymythos.org/wp-content/uploads/2025/10/The-Nebula-Archetype-Featured-scaled.webp') center/cover no-repeat;
       animation: nebulaZoom 45s ease-in-out infinite alternate;
-      filter: brightness(0.7) contrast(1.15) saturate(1.3);
+      filter: brightness(0.6) contrast(1.2) saturate(1.35);
     }
-
-    @keyframes nebulaZoom {
-      0% { transform: scale(1) rotate(0deg); }
-      100% { transform: scale(1.15) rotate(2deg); }
+    @keyframes nebulaZoom { 0% { transform: scale(1) rotate(0deg); } 100% { transform: scale(1.15) rotate(2deg); } }
+    .scanlines::after {
+      content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,255,159,0.03) 0px, rgba(0,255,159,0.03) 1px, transparent 1px, transparent 3px);
+      mix-blend-mode: overlay;
     }
-
-    .neon-text { text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ff9f; }
-    
+    .neon-text { text-shadow: 0 0 8px #00ff9f, 0 0 18px #00ff9f, 0 0 30px rgba(0,255,159,0.4); }
+    .neon-soft { text-shadow: 0 0 6px rgba(0,255,159,0.6); }
     .game-btn {
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      background: #111;
-      border: 2px solid #00ff9f;
-      color: #00ff9f;
+      background: #111; border: 2px solid #00ff9f; color: #00ff9f; letter-spacing: 1px; border-radius: 8px;
     }
-    .game-btn:hover {
-      transform: scale(1.08) translateY(-3px);
-      box-shadow: 0 0 30px #00ff9f;
-      background: #1a1a1a;
-      color: #ffffff;
-      border-color: #ffffff;
-    }
+    .game-btn:hover { transform: scale(1.08) translateY(-3px); box-shadow: 0 0 30px #00ff9f; background: #1a1a1a; color: #fff; border-color: #fff; }
     .section { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
     .section.visible { opacity: 1; transform: translateY(0); }
-    canvas { border: 4px solid #00ff9f; image-rendering: pixelated; box-shadow: 0 0 30px #00ff9f; }
+    canvas { border: 4px solid #00ff9f; image-rendering: pixelated; box-shadow: 0 0 30px #00ff9f; border-radius: 6px; }
+    .card-glow { transition: all .3s ease; }
+    .card-glow:hover { box-shadow: 0 0 25px rgba(0,255,159,.35); transform: translateY(-4px); }
+    .hr-neon { height: 2px; background: linear-gradient(90deg, transparent, #00ff9f, transparent); border: 0; }
+    #gate {
+      position: fixed; inset: 0; z-index: 100;
+      background: radial-gradient(circle at center, rgba(10,10,10,0.96), rgba(0,0,0,0.99));
+      backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .gate-hidden { display: none !important; }
+    .robot-float { animation: robotFloat 3s ease-in-out infinite; }
+    @keyframes robotFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    .shake { animation: shake 0.4s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+    #siteContent.locked { filter: blur(8px); pointer-events: none; user-select: none; }
+    .type-line::after { content:"▋"; animation: caret 1s steps(2) infinite; }
+    @keyframes caret { 0%,50%{opacity:1} 51%,100%{opacity:0} }
   </style>
 </head>
-<body class="min-h-screen relative">
+<body class="min-h-screen relative scanlines">
 
-  <!-- Nebula Background -->
   <div class="nebula-bg"></div>
 
-  <!-- HEADER -->
+  <!-- ================= ROBOT VERIFICATION GATE ================= -->
+  <div id="gate">
+    <div class="w-full max-w-lg bg-black/80 border-2 border-[#00ff9f] rounded-2xl p-8 shadow-[0_0_40px_#00ff9f]">
+      <div class="flex flex-col items-center mb-6">
+        <div class="robot-float text-7xl mb-2">🤖</div>
+        <h2 class="text-2xl font-bold neon-text text-center">HUMAN VERIFICATION</h2>
+        <p class="text-sm text-[#00ff9f]/70 mt-1 text-center type-line">SYSTEM: prove you are not a robot...</p>
+      </div>
+
+      <div id="botLog" class="bg-[#0d0d0d] border border-[#00ff9f]/40 rounded-lg p-4 h-40 overflow-y-auto text-sm space-y-2 mb-4"></div>
+
+      <div id="step1">
+        <label class="block mb-2 text-[#00ff9f]/80">SOLVE THE ACCESS CODE:</label>
+        <p id="puzzleQ" class="text-lg text-white mb-3 neon-soft"></p>
+        <div class="flex gap-3">
+          <input id="puzzleInput" type="text" inputmode="numeric" placeholder="answer"
+                 class="flex-1 bg-black border-2 border-[#00ff9f]/60 rounded-lg px-4 py-3 text-white focus:border-[#00ff9f] focus:outline-none">
+          <button id="puzzleBtn" class="game-btn px-6 py-3 font-bold">VERIFY</button>
+        </div>
+      </div>
+
+      <div id="step2" class="hidden">
+        <label class="block mb-2 text-[#00ff9f]/80">ENTER YOUR INSTAGRAM HANDLE (OPTIONAL):</label>
+        <div class="flex gap-3">
+          <div class="flex-1 flex items-center bg-black border-2 border-[#00ff9f]/60 rounded-lg px-3 focus-within:border-[#00ff9f]">
+            <span class="text-[#00ff9f]/60">@</span>
+            <input id="igInput" type="text" placeholder="your_username"
+                   class="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none">
+          </div>
+          <button id="igBtn" class="game-btn px-6 py-3 font-bold">ENTER</button>
+        </div>
+        <button id="skipBtn" class="text-xs text-[#00ff9f]/50 mt-3 underline hover:text-[#00ff9f]">Skip &amp; enter site →</button>
+        <p class="text-[10px] text-[#00ff9f]/40 mt-2 leading-relaxed">
+          * Optional. Format is validated locally — nothing is stored or sent anywhere.
+        </p>
+      </div>
+
+      <p id="gateMsg" class="text-center text-sm mt-4 min-h-[1.2rem]"></p>
+    </div>
+  </div>
+
+  <!-- ================= SITE CONTENT ================= -->
+  <div id="siteContent" class="locked">
+
   <header class="border-b border-[#00ff9f] bg-black/90 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row gap-3 justify-between items-center">
       <div class="flex items-center gap-3">
         <span class="text-3xl">🕹️</span>
         <h1 class="text-2xl font-bold neon-text">HAFIL RAZAK</h1>
       </div>
-      <nav class="flex gap-6 text-sm">
-        <a href="#about" class="hover:text-white transition game-btn px-4 py-2 rounded">ABOUT</a>
-        <a href="#skills" class="hover:text-white transition game-btn px-4 py-2 rounded">SKILLS</a>
-        <a href="#projects" class="hover:text-white transition game-btn px-4 py-2 rounded">QUESTS</a>
-        <a href="#arcade" class="hover:text-white transition game-btn px-4 py-2 rounded">ARCADE</a>
-        <a href="#contact" class="hover:text-white transition game-btn px-4 py-2 rounded">CONNECT</a>
+      <nav class="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm justify-center">
+        <a href="#about" class="game-btn px-4 py-2">ABOUT</a>
+        <a href="#skills" class="game-btn px-4 py-2">SKILLS</a>
+        <a href="#projects" class="game-btn px-4 py-2">QUESTS</a>
+        <a href="#arcade" class="game-btn px-4 py-2">ARCADE</a>
+        <a href="#contact" class="game-btn px-4 py-2">CONNECT</a>
       </nav>
     </div>
   </header>
 
-  <!-- HERO -->
   <section class="min-h-screen flex items-center justify-center relative">
     <div class="text-center px-6 max-w-4xl z-10">
-      <h1 class="text-7xl md:text-8xl font-bold mb-4 neon-text">HAFIL RAZAK</h1>
-      <p class="text-3xl text-[#00ff9f]/80 mb-10">COMPUTER SCIENCE STUDENT • CODE WARRIOR</p>
+      <p class="text-[#00ff9f]/60 tracking-[0.4em] mb-4 text-sm">// PLAYER ONE READY</p>
+      <h1 class="text-6xl md:text-8xl font-bold mb-4 neon-text">HAFIL RAZAK</h1>
+      <p class="text-2xl md:text-3xl text-[#00ff9f]/80 mb-10">COMPUTER SCIENCE STUDENT • CODE WARRIOR</p>
       <div class="flex flex-wrap justify-center gap-6">
-        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg">GITHUB</a>
-        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg font-bold">LINKEDIN</a>
+        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg"><i class="fab fa-github mr-2"></i>GITHUB</a>
+        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn px-8 py-4 text-lg font-bold"><i class="fab fa-linkedin mr-2"></i>LINKEDIN</a>
       </div>
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="about" class="section py-20 bg-black/90 border-t border-[#00ff9f]/30">
     <div class="max-w-5xl mx-auto px-6">
-      <h2 class="text-5xl font-bold mb-10 flex items-center gap-4"><span class="text-4xl">📍</span> MISSION BRIEF</h2>
-      <div class="grid md:grid-cols-2 gap-12">
-        <div>
-          <p class="text-lg leading-relaxed text-[#00ff9f]/90">Passionate Computer Science student from India building real-world solutions through code.</p>
-        </div>
-        <div class="bg-[#111] p-8 border border-[#00ff9f]/50">
-          <h3 class="text-xl mb-6 text-white">CURRENT STATUS</h3>
+      <h2 class="text-4xl md:text-5xl font-bold mb-3 flex items-center gap-4"><span class="text-4xl">📍</span> MISSION BRIEF</h2>
+      <hr class="hr-neon mb-10">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div><p class="text-lg leading-relaxed text-[#00ff9f]/90">Passionate Computer Science student from India building real-world solutions through code. Always leveling up, one commit at a time.</p></div>
+        <div class="bg-[#111] p-8 border border-[#00ff9f]/50 rounded-xl card-glow">
+          <h3 class="text-xl mb-6 text-white neon-soft">CURRENT STATUS</h3>
           <ul class="space-y-4">
-            <li class="flex justify-between"><span>BASE</span><span class="text-white">India</span></li>
-            <li class="flex justify-between"><span>BRANCH</span><span class="text-white">Computer Science</span></li>
+            <li class="flex justify-between border-b border-[#00ff9f]/20 pb-2"><span>BASE</span><span class="text-white">India</span></li>
+            <li class="flex justify-between border-b border-[#00ff9f]/20 pb-2"><span>BRANCH</span><span class="text-white">Computer Science</span></li>
             <li class="flex justify-between"><span>MAIN QUEST</span><span class="text-white">Software Engineering</span></li>
           </ul>
         </div>
@@ -98,96 +142,194 @@
     </div>
   </section>
 
-  <!-- SKILLS -->
   <section id="skills" class="section py-20 bg-[#0a0a0a]">
     <div class="max-w-5xl mx-auto px-6">
-      <h2 class="text-5xl font-bold mb-12 text-center">🛠️ POWER-UPS</h2>
+      <h2 class="text-4xl md:text-5xl font-bold mb-3 text-center">🛠️ POWER-UPS</h2>
+      <hr class="hr-neon mb-12 max-w-xs mx-auto">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🐍 Python</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">☕ Java</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🌐 JS/React</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🗄️ SQL</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">📡 Node.js</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">⚡ Tailwind</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🔧 Git</div>
-        <div class="bg-black border border-[#00ff9f]/40 p-6 hover:border-[#00ff9f] hover:scale-105 transition text-center">🧠 DSA</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">🐍 Python</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">☕ Java</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">🌐 JS/React</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">🗄️ SQL</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">📡 Node.js</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">⚡ Tailwind</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">🔧 Git</div>
+        <div class="bg-black border border-[#00ff9f]/40 p-6 rounded-xl card-glow hover:border-[#00ff9f] text-center">🧠 DSA</div>
       </div>
     </div>
   </section>
 
-  <!-- PROJECTS -->
   <section id="projects" class="section py-20 bg-black/90 border-t border-[#00ff9f]/30">
     <div class="max-w-5xl mx-auto px-6">
-      <h2 class="text-5xl font-bold mb-12">📜 ACTIVE QUESTS</h2>
+      <h2 class="text-4xl md:text-5xl font-bold mb-3">📜 ACTIVE QUESTS</h2>
+      <hr class="hr-neon mb-12">
       <div class="grid md:grid-cols-2 gap-8">
-        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
-          <h3 class="text-2xl font-bold mb-3">Pet health AI</h3>
-          <a href="https://github.com/hafilrazz/pet-AI" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+        <div class="border border-[#00ff9f]/50 p-8 rounded-xl card-glow hover:bg-[#111] hover:border-[#00ff9f] group">
+          <h3 class="text-2xl font-bold mb-3">Pet Health AI</h3>
+          <p class="text-sm text-[#00ff9f]/60 mb-4">AI-powered assistant for monitoring pet wellness.</p>
+          <a href="https://github.com/hafilrazz/pet-AI" target="_blank" class="text-sm border-b border-[#00ff9f] hover:text-white">VIEW REPO →</a>
         </div>
-        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+        <div class="border border-[#00ff9f]/50 p-8 rounded-xl card-glow hover:bg-[#111] hover:border-[#00ff9f] group">
           <h3 class="text-2xl font-bold mb-3">Neurolense</h3>
-          <a href="https://github.com/hafilrazz/neurolense" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+          <p class="text-sm text-[#00ff9f]/60 mb-4">Experimental vision / neural interface project.</p>
+          <a href="https://github.com/hafilrazz/neurolense" target="_blank" class="text-sm border-b border-[#00ff9f] hover:text-white">VIEW REPO →</a>
         </div>
-        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+        <div class="border border-[#00ff9f]/50 p-8 rounded-xl card-glow hover:bg-[#111] hover:border-[#00ff9f] group">
           <h3 class="text-2xl font-bold mb-3">Net2bot</h3>
-          <a href="https://github.com/hafilrazz/Net2bot" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+          <p class="text-sm text-[#00ff9f]/60 mb-4">Networking automation bot.</p>
+          <a href="https://github.com/hafilrazz/Net2bot" target="_blank" class="text-sm border-b border-[#00ff9f] hover:text-white">VIEW REPO →</a>
         </div>
-        <div class="border border-[#00ff9f]/50 p-8 hover:bg-[#111] hover:border-[#00ff9f] transition group">
+        <div class="border border-[#00ff9f]/50 p-8 rounded-xl card-glow hover:bg-[#111] hover:border-[#00ff9f] group">
           <h3 class="text-2xl font-bold mb-3">Full-Stack Chat App</h3>
-          <a href="https://github.com/hafilrazz/full-stack_chatApp" target="_blank" class="text-sm border-b border-[#00ff9f]">VIEW REPO →</a>
+          <p class="text-sm text-[#00ff9f]/60 mb-4">Real-time messaging with full-stack architecture.</p>
+          <a href="https://github.com/hafilrazz/full-stack_chatApp" target="_blank" class="text-sm border-b border-[#00ff9f] hover:text-white">VIEW REPO →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ARCADE -->
   <section id="arcade" class="section py-20 bg-[#0a0a0a] border-t border-[#00ff9f]/30">
     <div class="max-w-6xl mx-auto px-6">
       <div class="grid md:grid-cols-2 gap-12">
         <div class="text-center">
-          <h2 class="text-5xl font-bold mb-6">🎮 RETRO ARCADE</h2>
+          <h2 class="text-4xl md:text-5xl font-bold mb-6">🎮 RETRO ARCADE</h2>
           <div class="flex justify-center gap-8 mb-6">
             <div>SCORE <span id="score" class="font-bold text-white">000</span></div>
             <div>HIGH <span id="highscore" class="font-bold text-white">000</span></div>
           </div>
-          <canvas id="snakeCanvas" width="400" height="400" class="mx-auto"></canvas>
+          <canvas id="snakeCanvas" width="400" height="400" class="mx-auto max-w-full"></canvas>
           <div class="mt-8 flex gap-4 justify-center">
             <button onclick="togglePause()" id="pauseBtn" class="game-btn px-8 py-3">PAUSE</button>
             <button onclick="resetGame()" class="game-btn px-8 py-3">RESTART</button>
           </div>
+          <p class="text-xs text-[#00ff9f]/40 mt-4">Arrow keys / WASD / swipe to move</p>
         </div>
-
         <div>
-          <h2 class="text-5xl font-bold mb-6 text-center">🏆 HALL OF FAME</h2>
-          <div id="leaderboard" class="bg-black border border-[#00ff9f]/50 p-6 text-left max-h-96 overflow-y-auto"></div>
+          <h2 class="text-4xl md:text-5xl font-bold mb-6 text-center">🏆 HALL OF FAME</h2>
+          <div id="leaderboard" class="bg-black border border-[#00ff9f]/50 rounded-xl p-6 text-left max-h-96 overflow-y-auto card-glow"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact" class="section py-20 bg-black/90">
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="text-5xl font-bold mb-10">🎮 READY TO TEAM UP?</h2>
+      <h2 class="text-4xl md:text-5xl font-bold mb-10">🎮 READY TO TEAM UP?</h2>
       <div class="flex justify-center gap-8 text-4xl mb-10">
-        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-linkedin"></i></a>
-        <a href="https://www.instagram.com/hafilrazz" target="_blank" class="game-btn"><i class="fab fa-instagram"></i></a>
+        <a href="https://github.com/hafilrazz" target="_blank" class="game-btn w-16 h-16 flex items-center justify-center rounded-xl"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" class="game-btn w-16 h-16 flex items-center justify-center rounded-xl"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/hafilrazz" target="_blank" class="game-btn w-16 h-16 flex items-center justify-center rounded-xl"><i class="fab fa-instagram"></i></a>
       </div>
+      <p class="text-[#00ff9f]/50 text-sm">© <span id="year"></span> HAFIL RAZAK — GAME OVER? INSERT COIN TO CONTINUE.</p>
     </div>
   </section>
 
+  </div><!-- /siteContent -->
+
   <script>
-    // Retro Sounds + Snake Game (same)
+    /* ================= ROBOT VERIFICATION GATE ================= */
+    const gate = document.getElementById('gate');
+    const siteContent = document.getElementById('siteContent');
+    const botLog = document.getElementById('botLog');
+    const gateMsg = document.getElementById('gateMsg');
+
+    if (sessionStorage.getItem('humanVerified') === 'true') {
+      gate.classList.add('gate-hidden');
+      siteContent.classList.remove('locked');
+    }
+
+    function botSay(text, who='BOT') {
+      const line = document.createElement('div');
+      const color = who === 'YOU' ? 'text-white' : 'text-[#00ff9f]';
+      line.innerHTML = `<span class="${color}"><b>${who}:</b> ${text}</span>`;
+      botLog.appendChild(line);
+      botLog.scrollTop = botLog.scrollHeight;
+    }
+
+    let answer = 0;
+    function makePuzzle() {
+      const a = Math.floor(Math.random()*8)+2, b = Math.floor(Math.random()*8)+2;
+      const ops = [
+        {q:`What is ${a} + ${b}?`, r:a+b},
+        {q:`What is ${a} × ${b}?`, r:a*b},
+        {q:`How many letters are in the word "HUMAN"?`, r:5},
+        {q:`Type the number ${a}${b} backwards.`, r:parseInt((''+a+b).split('').reverse().join(''))},
+      ];
+      const p = ops[Math.floor(Math.random()*ops.length)];
+      answer = p.r;
+      document.getElementById('puzzleQ').textContent = p.q;
+      return p.q;
+    }
+
+    setTimeout(()=>botSay("Hello, traveler. I must confirm you're human. 🤖"), 400);
+    setTimeout(()=>{ const q = makePuzzle(); botSay(q); }, 1400);
+
+    document.getElementById('puzzleBtn').addEventListener('click', checkPuzzle);
+    document.getElementById('puzzleInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPuzzle(); });
+
+    function checkPuzzle() {
+      const val = document.getElementById('puzzleInput').value.trim();
+      botSay(val || '(empty)', 'YOU');
+      if (parseInt(val) === answer) {
+        gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
+        gateMsg.textContent = '✅ Human confirmed!';
+        botSay("Correct! One last (optional) step...");
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        setTimeout(()=>botSay("Optionally, share your Instagram handle — or just skip it."), 500);
+        document.getElementById('igInput').focus();
+      } else {
+        gateMsg.className = 'text-center text-sm mt-4 text-red-400';
+        gateMsg.textContent = '❌ Wrong answer, try again.';
+        botLog.classList.add('shake'); setTimeout(()=>botLog.classList.remove('shake'),400);
+        botSay("That doesn't look right. Here's a new one:");
+        setTimeout(()=>{ const q = makePuzzle(); botSay(q); }, 400);
+        document.getElementById('puzzleInput').value = '';
+      }
+    }
+
+    document.getElementById('igBtn').addEventListener('click', checkIG);
+    document.getElementById('igInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkIG(); });
+    document.getElementById('skipBtn').addEventListener('click', ()=> finishVerification("Skipped — welcome in! 🎮"));
+
+    function checkIG() {
+      let handle = document.getElementById('igInput').value.trim().replace(/^@/, '');
+      botSay('@' + (handle || '(empty)'), 'YOU');
+
+      if (!handle) { finishVerification("No handle given — that's okay. Welcome in! 🎮"); return; }
+
+      const valid = /^(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9._]{1,30}$/.test(handle);
+      if (!valid) {
+        gateMsg.className = 'text-center text-sm mt-4 text-red-400';
+        gateMsg.textContent = '❌ That is not a valid Instagram handle format.';
+        botLog.classList.add('shake'); setTimeout(()=>botLog.classList.remove('shake'),400);
+        botSay("That handle format isn't valid (letters, numbers, '.' and '_' only). Try again — or skip.");
+        return;
+      }
+
+      finishVerification(`Nice to meet you, @${handle}! Unlocking the site... 🔓`);
+    }
+
+    function finishVerification(msg) {
+      botSay(msg);
+      gateMsg.className = 'text-center text-sm mt-4 text-[#00ff9f]';
+      gateMsg.textContent = '✅ ACCESS GRANTED';
+      sessionStorage.setItem('humanVerified', 'true');
+      setTimeout(() => {
+        gate.style.transition = 'opacity 0.6s';
+        gate.style.opacity = '0';
+        siteContent.classList.remove('locked');
+        setTimeout(()=> gate.classList.add('gate-hidden'), 600);
+      }, 900);
+    }
+
+    /* ================= RETRO SOUNDS + SNAKE GAME ================= */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, duration, type = 'square', vol = 0.3) {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+    function playBeep(freq, duration, type='square', vol=0.3) {
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
       osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.value = vol;
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start();
-      setTimeout(() => osc.stop(), duration);
+      gain.gain.value = vol; osc.connect(gain).connect(audioCtx.destination);
+      osc.start(); setTimeout(() => osc.stop(), duration);
     }
     function soundEat() { playBeep(800,80,'sawtooth',0.4); playBeep(1200,60,'sine',0.3); }
     function soundGameOver() { playBeep(200,600,'sawtooth',0.5); }
@@ -196,7 +338,7 @@
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
     const grid = 20;
-    let snake = [{x:10,y:10}], dx=1, dy=0, food={x:15,y:15}, score=0, gameInterval, paused=false, gameOverFlag=false;
+    let snake=[{x:10,y:10}], dx=1, dy=0, food={x:15,y:15}, score=0, gameInterval, paused=false, gameOverFlag=false;
 
     const highScoreEl = document.getElementById('highscore');
     let highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
@@ -205,89 +347,53 @@
     let touchStartX=0, touchStartY=0;
 
     function draw() {
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,canvas.width,canvas.height);
       ctx.fillStyle = '#00ff9f';
       snake.forEach(s => ctx.fillRect(s.x*grid, s.y*grid, grid-2, grid-2));
       ctx.fillStyle = '#ff00ff';
       ctx.fillRect(food.x*grid, food.y*grid, grid-2, grid-2);
     }
-
     function move() {
       if (paused || gameOverFlag) return;
       soundMove();
       const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-      if (head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)) {
-        soundGameOver(); endGame(); return;
-      }
+      if (head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x&&s.y===head.y)) { soundGameOver(); endGame(); return; }
       snake.unshift(head);
       if (head.x===food.x && head.y===food.y) {
-        score += 10;
-        document.getElementById('score').textContent = String(score).padStart(3,'0');
-        soundEat();
-        food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
+        score += 10; document.getElementById('score').textContent = String(score).padStart(3,'0');
+        soundEat(); food = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
       } else snake.pop();
       draw();
     }
-
     function endGame() {
-      gameOverFlag = true;
-      clearInterval(gameInterval);
-      if (score > 0 && score > highScore) {
-        highScore = score;
-        localStorage.setItem('snakeHighScore', highScore);
-        highScoreEl.textContent = String(highScore).padStart(3,'0');
-      }
+      gameOverFlag = true; clearInterval(gameInterval);
+      if (score > 0 && score > highScore) { highScore = score; localStorage.setItem('snakeHighScore', highScore); highScoreEl.textContent = String(highScore).padStart(3,'0'); }
       if (score > 0) updateLeaderboard();
     }
-
     function resetGame() {
-      snake = [{x:10,y:10}]; dx=1; dy=0; score=0;
+      snake=[{x:10,y:10}]; dx=1; dy=0; score=0;
       document.getElementById('score').textContent = '000';
-      food = {x:15,y:15}; gameOverFlag=false; paused=false;
-      clearInterval(gameInterval);
-      gameInterval = setInterval(move, 110);
-      draw();
+      food={x:15,y:15}; gameOverFlag=false; paused=false;
+      clearInterval(gameInterval); gameInterval = setInterval(move, 110); draw();
     }
-
-    function togglePause() {
-      paused = !paused;
-      document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE';
-    }
-
+    function togglePause() { paused = !paused; document.getElementById('pauseBtn').textContent = paused ? 'RESUME' : 'PAUSE'; }
     function getLocalScores() { return JSON.parse(localStorage.getItem('snakeLocalScores')) || []; }
-
     function updateLeaderboard() {
       let scores = getLocalScores();
       if (score > 0) scores.push({score: score, date: new Date().toLocaleDateString()});
-      scores.sort((a,b) => b.score - a.score);
-      scores = scores.slice(0, 8);
+      scores.sort((a,b) => b.score - a.score); scores = scores.slice(0, 8);
       localStorage.setItem('snakeLocalScores', JSON.stringify(scores));
       renderLeaderboard(scores);
     }
-
     function renderLeaderboard(scores) {
       const container = document.getElementById('leaderboard');
       let html = '<div class="space-y-3 text-sm">';
-      if (scores.length === 0) {
-        html += '<p class="opacity-60 text-center py-8">Play some games to fill the hall of fame!</p>';
-      } else {
-        scores.forEach((entry, i) => {
-          html += `
-            <div class="flex justify-between px-4 py-3 border-b border-[#00ff9f]/30">
-              <span>#${i+1} ${entry.date}</span>
-              <span class="font-bold">${String(entry.score).padStart(3,'0')}</span>
-            </div>`;
-        });
-      }
-      html += '</div>';
-      container.innerHTML = html;
+      if (scores.length === 0) { html += '<p class="opacity-60 text-center py-8">Play some games to fill the hall of fame!</p>'; }
+      else { scores.forEach((entry,i)=>{ html += `<div class="flex justify-between px-4 py-3 border-b border-[#00ff9f]/30"><span>#${i+1} ${entry.date}</span><span class="font-bold">${String(entry.score).padStart(3,'0')}</span></div>`; }); }
+      html += '</div>'; container.innerHTML = html;
     }
-
-    // Controls
     document.addEventListener('keydown', e => {
-      if (gameOverFlag) return;
-      let prevent = false;
+      if (gameOverFlag) return; let prevent=false;
       switch(e.key) {
         case 'ArrowUp': case 'w': case 'W': if(dy!==1){dx=0;dy=-1} prevent=true; break;
         case 'ArrowDown': case 's': case 'S': if(dy!==-1){dx=0;dy=1} prevent=true; break;
@@ -297,28 +403,20 @@
       }
       if (prevent) e.preventDefault();
     });
-
-    canvas.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; touchStartY = e.changedTouches[0].screenY; });
+    canvas.addEventListener('touchstart', e => { touchStartX=e.changedTouches[0].screenX; touchStartY=e.changedTouches[0].screenY; });
     canvas.addEventListener('touchend', e => {
       if (gameOverFlag) return;
-      const deltaX = e.changedTouches[0].screenX - touchStartX;
-      const deltaY = e.changedTouches[0].screenY - touchStartY;
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 30 && dx !== -1) { dx = 1; dy = 0; }
-        else if (deltaX < -30 && dx !== 1) { dx = -1; dy = 0; }
-      } else {
-        if (deltaY > 30 && dy !== -1) { dx = 0; dy = 1; }
-        else if (deltaY < -30 && dy !== 1) { dx = 0; dy = -1; }
-      }
+      const dX = e.changedTouches[0].screenX - touchStartX, dY = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dX) > Math.abs(dY)) { if (dX>30 && dx!==-1){dx=1;dy=0} else if (dX<-30 && dx!==1){dx=-1;dy=0} }
+      else { if (dY>30 && dy!==-1){dx=0;dy=1} else if (dY<-30 && dy!==1){dx=0;dy=-1} }
     });
 
-    // Init
     resetGame();
     renderLeaderboard(getLocalScores());
-
+    document.getElementById('year').textContent = new Date().getFullYear();
     document.querySelectorAll('.section').forEach(sec => {
-      new IntersectionObserver((e) => e[0].isIntersecting && sec.classList.add('visible'), {threshold: 0.1}).observe(sec);
+      new IntersectionObserver((e)=> e[0].isIntersecting && sec.classList.add('visible'), {threshold:0.1}).observe(sec);
     });
   </script>
 </body>
-  </html>
+</html>
