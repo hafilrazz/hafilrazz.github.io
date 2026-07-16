@@ -1,159 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>document.documentElement.classList.add('js');</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#07090c">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="Skills and technologies — Hafil Razak.">
-  <title>hafil@kernel:~/skills</title>
+  <meta name="theme-color" content="#f8f2ec">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Skills — Hafil Razak.">
+  <title>Skills · Hafil Razak</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/kernel.css?v=20260716b">
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css?v=pitch1">
 </head>
 <body>
-  <div id="page-veil"></div>
-
-  <div id="shell" class="shell">
-    <header class="titlebar">
-      <div class="titlebar-left">
-        <div class="traffic" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-        <h1><strong>hafil@kernel</strong>: ~/skills — tty1</h1>
-      </div>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
-        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <i class="brand-mark" aria-hidden="true"></i>
+        <span>hafil razak</span>
+      </a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
       </button>
-      <nav class="nav" id="primary-nav" aria-label="Primary">
+      <nav class="nav" id="site-nav" aria-label="Primary">
         <a href="index.html" data-nav>home</a>
         <a href="about.html" data-nav>about</a>
-        <a href="skills.html" data-nav class="active">skills</a>
+        <a href="skills.html" data-nav>skills</a>
         <a href="projects.html" data-nav>projects</a>
         <a href="contact.html" data-nav>contact</a>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <div class="workspace">
-      <aside class="sidebar" aria-label="Filesystem">
-        <div class="sidebar-label">/home/hafil</div>
-        <ul class="tree">
-          <li><a href="index.html" data-nav><span class="icon">~</span> home</a></li>
-          <li class="indent">
-            <ul class="tree">
-              <li><a href="about.html" data-nav><span class="icon">◆</span> about.md</a></li>
-              <li><a href="skills.html" data-nav class="active"><span class="icon">⚙</span> skills.mod</a></li>
-              <li><a href="projects.html" data-nav><span class="icon">▣</span> projects/</a></li>
-              <li><a href="contact.html" data-nav><span class="icon">@</span> contact.sh</a></li>
-            </ul>
-          </li>
-        </ul>
-        <div class="sidebar-hint">
-          Hover meters · <kbd>Ctrl</kbd>+<kbd>K</kbd>
-        </div>
-      </aside>
-
-      <main class="main">
-        <div class="content">
-          <div class="prompt-line">
-            <span><span class="prompt-user">hafil</span><span class="prompt-host">@kernel</span>:<span class="prompt-path">~/skills</span><span class="prompt-sym">$</span></span>
-            <span class="muted">lsmod &amp;&amp; cat /proc/loadavg</span>
-          </div>
-
-          <h2 class="page-title" data-type="loaded modules"></h2>
-          <p class="page-sub">runtime capabilities · <code>lsmod | sort</code></p>
-          <hr class="hr">
-
-          <div class="grid-4" style="margin-bottom: 1.5rem;">
-            <div class="chip">Python</div>
-            <div class="chip">Java</div>
-            <div class="chip">JS / React</div>
-            <div class="chip">SQL</div>
-            <div class="chip">Node.js</div>
-            <div class="chip">Tailwind</div>
-            <div class="chip">Git</div>
-            <div class="chip">DSA</div>
-          </div>
-
-          <div class="panel" style="margin-bottom: 1rem;">
-            <h3>// proficiency map</h3>
-            <div class="meters" style="margin-top: 1rem;">
-              <div class="meter">
-                <div class="meter-top"><span class="name">Python</span><span class="pct">88%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="88"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-top"><span class="name">JavaScript / React</span><span class="pct">82%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="82"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-top"><span class="name">Java</span><span class="pct">78%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="78"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-top"><span class="name">Node.js / SQL</span><span class="pct">75%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="75"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-top"><span class="name">DSA / systems</span><span class="pct">80%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="80"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-top"><span class="name">Git / tooling</span><span class="pct">85%</span></div>
-                <div class="meter-track"><div class="meter-fill" data-value="85"></div></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <article class="panel">
-              <h3>// languages</h3>
-              <p style="margin-top: 0.65rem;">Python · Java · JavaScript</p>
-              <p class="meta">runtime: polyglot</p>
-            </article>
-            <article class="panel">
-              <h3>// stack</h3>
-              <p style="margin-top: 0.65rem;">React · Node.js · SQL · Tailwind</p>
-              <p class="meta">layer: full-stack capable</p>
-            </article>
-            <article class="panel">
-              <h3>// toolchain</h3>
-              <p style="margin-top: 0.65rem;">Git · debugging · iterative delivery</p>
-              <p class="meta">vcs: always shipping</p>
-            </article>
-            <article class="panel">
-              <h3>// fundamentals</h3>
-              <p style="margin-top: 0.65rem;">Data structures · algorithms · systems thinking</p>
-              <p class="meta">core: still optimizing</p>
-            </article>
-          </div>
-
-          <div class="cmd-row">
-            <a class="cmd-btn" href="projects.html" data-nav>$ cd ../projects</a>
-            <a class="cmd-btn" href="about.html" data-nav>$ cd ../about</a>
-          </div>
-        </div>
-      </main>
+  <main class="wrap">
+    <div class="steps" aria-hidden="true">
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot on"></span>
+      <span class="step-dot"></span>
     </div>
 
-    <footer class="statusbar">
-      <div>
-        <span class="ok">● NORMAL</span>
-        <span class="sep hide-sm">|</span>
-        <span class="hide-sm">tty1</span>
-        <span class="sep">|</span>
-        <span>~/skills</span>
-        <span class="sep hide-sm">|</span>
-        <span class="hide-sm">scroll <span id="sys-scroll">0%</span></span>
-      </div>
-      <div>
-        <span>uptime <span id="sys-uptime">00:00</span></span>
-        <span class="sep">|</span>
-        <span id="sys-time">--:--:--</span>
-      </div>
-    </footer>
-  </div>
+    <h1 class="page-title reveal">Skills</h1>
+    <p class="lede reveal">Loaded modules · proficiency map · runtime stack.</p>
 
-  <script src="js/kernel.js?v=20260716b"></script>
+    <section class="section reveal">
+      <p class="section-label">// experience type</p>
+      <div class="choices" data-pick="multi">
+        <span class="choice is-on">Systems-heavy</span>
+        <span class="choice is-on">Skill-based</span>
+        <span class="choice">Narrative-driven</span>
+        <span class="choice is-on">Exploration-focused</span>
+        <span class="choice">Atmospheric</span>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <p class="section-label">// toolkit</p>
+      <div class="choices" data-pick="multi">
+        <span class="choice is-on">Python</span>
+        <span class="choice is-on">Java</span>
+        <span class="choice is-on">JS / React</span>
+        <span class="choice is-on">SQL</span>
+        <span class="choice is-on">Node.js</span>
+        <span class="choice is-on">Tailwind</span>
+        <span class="choice is-on">Git</span>
+        <span class="choice is-on">DSA</span>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <p class="section-label">// load levels</p>
+      <div class="card stack" style="gap: 1rem;">
+        <div class="skill">
+          <div class="skill-top"><span>Python</span><span>88%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="88"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-top"><span>JavaScript / React</span><span>82%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="82"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-top"><span>Java</span><span>78%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="78"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-top"><span>Node / SQL</span><span>75%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="75"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-top"><span>DSA / systems</span><span>80%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="80"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-top"><span>Git / tooling</span><span>85%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-value="85"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="btn-row reveal">
+      <a class="btn btn-accent" href="projects.html">projects →</a>
+      <a class="btn btn-ghost" href="about.html">← about</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> hafil razak</span>
+    <span>skills.mod</span>
+  </footer>
+
+  <script src="js/site.js?v=pitch1"></script>
 </body>
 </html>

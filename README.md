@@ -1,31 +1,28 @@
 # hafilrazz.github.io
 
-Kernel-style interactive portfolio for **Hafil Razak**.
+Personal portfolio for **Hafil Razak**, redesigned after the FormGrid **Indie Game Pitch** template.
+
+## Design system
+
+- Paper cream `#f8f2ec`
+- Ink `#251b12`
+- Coral accent `#fe5b4c`
+- Pixel headings: **Silkscreen**
+- Body: **Source Sans 3**
+- Thick **dotted** borders, sharp corners
 
 ## Structure
 
 ```
-├── index.html
-├── about.html
-├── skills.html
-├── projects.html
-├── contact.html
-├── css/kernel.css
-└── js/kernel.js
+index.html
+about.html
+skills.html
+projects.html
+contact.html
+css/site.css
+js/site.js
 ```
 
-## Interaction
+## Deploy
 
-| Input | Action |
-|--------|--------|
-| `Ctrl+K` / `⌘K` | Command palette |
-| `/` | Focus shell (home) |
-| Tab | Complete shell command |
-| ↑ / ↓ | Shell history |
-| Mouse | Custom cursor, magnetic buttons, card tilt, spotlight |
-
-## Local preview
-
-```bash
-npx serve .
-```
+Push to `main` on `hafilrazz.github.io` — GitHub Pages serves from the root.

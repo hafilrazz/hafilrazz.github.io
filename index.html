@@ -1,149 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>document.documentElement.classList.add('js');</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#07090c">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="Hafil Razak — Computer Science student. Interactive kernel-style portfolio.">
-  <title>hafil@kernel:~</title>
+  <meta name="theme-color" content="#f8f2ec">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Hafil Razak — Computer Science student. Portfolio.">
+  <title>Hafil Razak</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/kernel.css?v=20260716b">
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css?v=pitch1">
 </head>
 <body>
-  <div id="boot-screen" aria-hidden="true"></div>
-  <div id="page-veil"></div>
-
-  <div id="shell" class="shell">
-    <header class="titlebar">
-      <div class="titlebar-left">
-        <div class="traffic" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-        <h1><strong>hafil@kernel</strong>: ~ — tty1</h1>
-      </div>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
-        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <i class="brand-mark" aria-hidden="true"></i>
+        <span>hafil razak</span>
+      </a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
       </button>
-      <nav class="nav" id="primary-nav" aria-label="Primary">
-        <a href="index.html" data-nav class="active">home</a>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="index.html" data-nav>home</a>
         <a href="about.html" data-nav>about</a>
         <a href="skills.html" data-nav>skills</a>
         <a href="projects.html" data-nav>projects</a>
         <a href="contact.html" data-nav>contact</a>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <div class="workspace">
-      <aside class="sidebar" aria-label="Filesystem">
-        <div class="sidebar-label">/home/hafil</div>
-        <ul class="tree">
-          <li><a href="index.html" data-nav class="active"><span class="icon">~</span> home</a></li>
-          <li class="indent">
-            <ul class="tree">
-              <li><a href="about.html" data-nav><span class="icon">◆</span> about.md</a></li>
-              <li><a href="skills.html" data-nav><span class="icon">⚙</span> skills.mod</a></li>
-              <li><a href="projects.html" data-nav><span class="icon">▣</span> projects/</a></li>
-              <li><a href="contact.html" data-nav><span class="icon">@</span> contact.sh</a></li>
-            </ul>
-          </li>
-        </ul>
-        <div class="sidebar-hint">
-          Press <kbd>Ctrl</kbd>+<kbd>K</kbd> for command palette.<br>
-          <kbd>/</kbd> focuses the shell.
-        </div>
-      </aside>
-
-      <main class="main">
-        <div class="content">
-          <div class="prompt-line">
-            <span><span class="prompt-user">hafil</span><span class="prompt-host">@kernel</span>:<span class="prompt-path">~</span><span class="prompt-sym">$</span></span>
-            <span class="muted">cat README.md &amp;&amp; exec hksh</span>
-          </div>
-
-          <div class="hero">
-<pre class="hero-ascii" aria-hidden="true">
- _   _    _    _____ ___ _     
-| | | |  / \  |  ___|_ _| |    
-| |_| | / _ \ | |_   | || |    
-|  _  |/ ___ \|  _|  | || |___ 
-|_| |_/_/   \_\_|   |___|_____|
-        K E R N E L   v2.0
-</pre>
-            <h2 class="page-title" data-type="Hafil Razak"></h2>
-            <p class="page-sub">Computer Science student · software operator · <code>always compiling</code></p>
-          </div>
-
-          <div class="stats">
-            <div class="stat">
-              <span class="stat-val" data-count="4" data-suffix="+">0</span>
-              <span class="stat-lbl">projects</span>
-            </div>
-            <div class="stat">
-              <span class="stat-val" data-count="8" data-suffix="">0</span>
-              <span class="stat-lbl">modules</span>
-            </div>
-            <div class="stat">
-              <span class="stat-val">24/7</span>
-              <span class="stat-lbl">curious</span>
-            </div>
-          </div>
-
-          <div class="log-block">
-            <div><span class="accent">[boot]</span> identity module loaded</div>
-            <div><span class="info">[net]</span> github://hafilrazz linked</div>
-            <div><span class="accent">[fs]</span> mounted /projects, /skills, /about</div>
-            <div><span class="warn">[ui]</span> compositor · palette · shell online</div>
-            <div><span class="muted">[sys]</span> Ctrl+K · / · Tab · ↑ history</div>
-          </div>
-
-          <p class="lead">Building real-world systems one commit at a time.</p>
-          <p class="desc">
-            This interface is a personal portfolio presented as a lightweight kernel shell.
-            Jump modules from the tree, drive the terminal, or open the command palette.
-          </p>
-
-          <div class="cmd-row">
-            <a class="cmd-btn" href="about.html" data-nav>$ cd about</a>
-            <a class="cmd-btn" href="projects.html" data-nav>$ cd projects</a>
-            <a class="cmd-btn" href="https://github.com/hafilrazz" target="_blank" rel="noopener">$ open github</a>
-            <button type="button" class="cmd-btn" data-palette>$ palette</button>
-          </div>
-
-          <section class="term" aria-label="Interactive shell">
-            <div class="term-head">
-              <span class="live">hksh — interactive</span>
-              <span>stdin · stdout · history</span>
-            </div>
-            <div id="term-body" class="term-body"></div>
-            <div class="term-input-row">
-              <label class="ps1" for="term-input">hafil@kernel:~$</label>
-              <input id="term-input" type="text" autocomplete="off" spellcheck="false" placeholder="help | ls | cd projects | neofetch | palette" aria-label="Shell command">
-            </div>
-          </section>
-        </div>
-      </main>
+  <main class="wrap">
+    <div class="cover reveal" aria-hidden="true">
+      <div class="cover-fallback">LEVEL UP // PORTFOLIO</div>
     </div>
 
-    <footer class="statusbar">
-      <div>
-        <span class="ok">● NORMAL</span>
-        <span class="sep hide-sm">|</span>
-        <span class="hide-sm">tty1</span>
-        <span class="sep">|</span>
-        <span>~/</span>
-        <span class="sep hide-sm">|</span>
-        <span class="hide-sm">scroll <span id="sys-scroll">0%</span></span>
-      </div>
-      <div>
-        <span>uptime <span id="sys-uptime">00:00</span></span>
-        <span class="sep">|</span>
-        <span id="sys-time">--:--:--</span>
-      </div>
-    </footer>
-  </div>
+    <div class="steps" aria-hidden="true">
+      <span class="step-dot on"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
+    </div>
 
-  <script src="js/kernel.js?v=20260716b"></script>
+    <h1 class="page-title reveal">Hafil Razak</h1>
+    <p class="lede reveal">
+      Computer Science student building bold tools and unusual ideas —
+      one commit at a time.
+    </p>
+
+    <section class="section reveal">
+      <p class="section-label">// elevator pitch</p>
+      <div class="field">
+        <label>Describe it in one sentence.</label>
+        <p class="value">
+          I ship full-stack experiments and real-world projects with curiosity,
+          systems thinking, and a bias for shipping.
+        </p>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <p class="section-label">// how far along are you?</p>
+      <div class="choices" data-pick="single">
+        <span class="choice">Just an idea</span>
+        <span class="choice">Early prototype</span>
+        <span class="choice is-on">Playable build</span>
+        <span class="choice">Polishing</span>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <p class="section-label">// featured quests</p>
+      <div class="stack">
+        <article class="card">
+          <h3>pet-AI</h3>
+          <p>AI-powered assistant for monitoring pet wellness.</p>
+          <p class="meta">stack · AI · active</p>
+        </article>
+        <article class="card">
+          <h3>neurolense</h3>
+          <p>Experimental vision / neural interface project.</p>
+          <p class="meta">stack · vision · research</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="btn-row reveal">
+      <a class="btn btn-accent" href="projects.html">view projects</a>
+      <a class="btn btn-primary" href="about.html">about me</a>
+      <a class="btn btn-ghost" href="https://github.com/hafilrazz" target="_blank" rel="noopener">github ↗</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> hafil razak</span>
+    <span>made to ship</span>
+  </footer>
+
+  <script src="js/site.js?v=pitch1"></script>
 </body>
 </html>
