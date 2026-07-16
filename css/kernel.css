@@ -275,11 +275,17 @@ body::after {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  opacity: 0;
-  transform: translateY(14px);
+  /* Visible by default — if JS fails, site still works (no black screen) */
+  opacity: 1;
+  transform: none;
   transition: opacity var(--page-ms) var(--ease-out), transform var(--page-ms) var(--ease-out);
 }
-.shell.ready {
+/* Only hide briefly when JS is active and still booting */
+html.js .shell:not(.ready):not(.leaving) {
+  opacity: 0;
+  transform: translateY(10px);
+}
+html.js .shell.ready {
   opacity: 1;
   transform: none;
 }

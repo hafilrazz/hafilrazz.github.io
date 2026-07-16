@@ -908,30 +908,44 @@
 
   /* ---------- init ---------- */
   async function init() {
-    setActiveNav();
-    ensureVeil();
-    initNoise();
-    initMobileNav();
-    bindNavTransitions();
-    updateClock();
-    updateUptime();
-    initScrollProgress();
-    initPalette();
-    initYear();
+    // hard failsafe: never leave the page invisible
+    const forceReady = () => {
+      const shell = qs("#shell");
+      if (shell) shell.classList.add("ready");
+      const boot = qs("#boot-screen");
+      if (boot) boot.classList.add("done");
+      const veil = qs("#page-veil");
+      if (veil) veil.classList.remove("active");
+    };
+    setTimeout(forceReady, 1500);
 
-    // heavy effects only when profile allows
-    initCursor();
-    initFx();
+    try {
+      setActiveNav();
+      ensureVeil();
+      initNoise();
+      initMobileNav();
+      bindNavTransitions();
+      updateClock();
+      updateUptime();
+      initScrollProgress();
+      initPalette();
+      initYear();
 
-    await runBoot();
+      // heavy effects only when profile allows
+      initCursor();
+      initFx();
 
-    initTerminal();
-    initTypeTitle();
-    initPointerFX();
-    initReveals();
+      await runBoot();
 
-    const veil = qs("#page-veil");
-    if (veil) requestAnimationFrame(() => veil.classList.remove("active"));
+      initTerminal();
+      initTypeTitle();
+      initPointerFX();
+      initReveals();
+    } catch (err) {
+      console.error("[kernel]", err);
+    } finally {
+      forceReady();
+    }
   }
 
   if (document.readyState === "loading") {
