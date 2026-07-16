@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#07090c">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Contact Hafil Razak — GitHub, LinkedIn, Instagram.">
+  <title>hafil@kernel:~/contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/kernel.css">
+</head>
+<body>
+  <div id="page-veil"></div>
+
+  <div id="shell" class="shell">
+    <header class="titlebar">
+      <div class="titlebar-left">
+        <div class="traffic" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+        <h1><strong>hafil@kernel</strong>: ~/contact — tty1</h1>
+      </div>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <nav class="nav" id="primary-nav" aria-label="Primary">
+        <a href="index.html" data-nav>home</a>
+        <a href="about.html" data-nav>about</a>
+        <a href="skills.html" data-nav>skills</a>
+        <a href="projects.html" data-nav>projects</a>
+        <a href="contact.html" data-nav class="active">contact</a>
+      </nav>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar" aria-label="Filesystem">
+        <div class="sidebar-label">/home/hafil</div>
+        <ul class="tree">
+          <li><a href="index.html" data-nav><span class="icon">~</span> home</a></li>
+          <li class="indent">
+            <ul class="tree">
+              <li><a href="about.html" data-nav><span class="icon">◆</span> about.md</a></li>
+              <li><a href="skills.html" data-nav><span class="icon">⚙</span> skills.mod</a></li>
+              <li><a href="projects.html" data-nav><span class="icon">▣</span> projects/</a></li>
+              <li><a href="contact.html" data-nav class="active"><span class="icon">@</span> contact.sh</a></li>
+            </ul>
+          </li>
+        </ul>
+        <div class="sidebar-hint">
+          Interfaces listening · handshake anytime
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="content">
+          <div class="prompt-line">
+            <span><span class="prompt-user">hafil</span><span class="prompt-host">@kernel</span>:<span class="prompt-path">~/contact</span><span class="prompt-sym">$</span></span>
+            <span class="muted">./contact.sh --list --verbose</span>
+          </div>
+
+          <h2 class="page-title" data-type="open channels"></h2>
+          <p class="page-sub">ready to team up · handshake on any interface · <code>netstat -an</code></p>
+          <hr class="hr">
+
+          <div class="panel" style="margin-bottom: 1.25rem;">
+            <h3>// interfaces</h3>
+            <ul class="kv" style="margin-top: 0.85rem;">
+              <li><span class="k">ETH0</span><span class="v">GitHub · hafilrazz</span></li>
+              <li><span class="k">ETH1</span><span class="v">LinkedIn · hafilrazz</span></li>
+              <li><span class="k">WLAN0</span><span class="v">Instagram · hafilrazz</span></li>
+              <li><span class="k">STATUS</span><span class="v accent">listening</span></li>
+            </ul>
+          </div>
+
+          <div class="social">
+            <a href="https://github.com/hafilrazz" target="_blank" rel="noopener">
+              <span class="accent">↗</span> github.com/hafilrazz
+            </a>
+            <a href="https://www.linkedin.com/in/hafilrazz" target="_blank" rel="noopener">
+              <span class="accent">↗</span> linkedin.com/in/hafilrazz
+            </a>
+            <a href="https://www.instagram.com/hafilrazz" target="_blank" rel="noopener">
+              <span class="accent">↗</span> instagram.com/hafilrazz
+            </a>
+          </div>
+
+          <div class="cmd-row">
+            <a class="cmd-btn" href="index.html" data-nav>$ cd ~</a>
+            <a class="cmd-btn" href="projects.html" data-nav>$ cd ../projects</a>
+            <button type="button" class="cmd-btn" data-palette>$ palette</button>
+          </div>
+
+          <p class="muted" style="margin-top: 2rem; font-size: 12px;">
+            © <span id="year"></span> HAFIL RAZAK — kernel halted? insert coffee to continue.
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <footer class="statusbar">
+      <div>
+        <span class="ok">● NORMAL</span>
+        <span class="sep hide-sm">|</span>
+        <span class="hide-sm">tty1</span>
+        <span class="sep">|</span>
+        <span>~/contact</span>
+        <span class="sep hide-sm">|</span>
+        <span class="hide-sm">scroll <span id="sys-scroll">0%</span></span>
+      </div>
+      <div>
+        <span>uptime <span id="sys-uptime">00:00</span></span>
+        <span class="sep">|</span>
+        <span id="sys-time">--:--:--</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/kernel.js"></script>
+</body>
+</html>
