@@ -1,7 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="indie">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function () {
+      var m = 'indie';
+      try { m = localStorage.getItem('hk_site_mode') || 'indie'; } catch (e) {}
+      if (m !== 'dark' && m !== 'indie') m = 'indie';
+      document.documentElement.setAttribute('data-mode', m);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#f8f2ec">
   <meta name="color-scheme" content="light">
@@ -10,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=pitch1">
+  <link rel="stylesheet" href="css/site.css?v=modes1">
 </head>
 <body>
   <header class="site-header">
@@ -19,9 +27,15 @@
         <i class="brand-mark" aria-hidden="true"></i>
         <span>hafil razak</span>
       </a>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
-        <span></span>
-      </button>
+      <div class="header-actions">
+        <div class="mode-toggle" role="group" aria-label="Color mode">
+          <button type="button" data-mode-btn="indie" aria-pressed="true">indie</button>
+          <button type="button" data-mode-btn="dark" aria-pressed="false">dark</button>
+        </div>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+        </button>
+      </div>
       <nav class="nav" id="site-nav" aria-label="Primary">
         <a href="index.html" data-nav>home</a>
         <a href="about.html" data-nav>about</a>
@@ -94,6 +108,6 @@
     <span>projects/</span>
   </footer>
 
-  <script src="js/site.js?v=pitch1"></script>
+  <script src="js/site.js?v=modes1"></script>
 </body>
 </html>

@@ -1,10 +1,54 @@
-/* Hafil portfolio — light interactions (mobile + desktop safe) */
+/* Hafil portfolio — interactions + indie/dark modes */
 (function () {
   "use strict";
+
+  const MODE_KEY = "hk_site_mode";
+  const DEFAULT_MODE = "indie";
+  const MODES = ["indie", "dark"];
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function normalizeMode(mode) {
+    return MODES.includes(mode) ? mode : DEFAULT_MODE;
+  }
+
+  function applyMode(mode) {
+    const m = normalizeMode(mode);
+    document.documentElement.setAttribute("data-mode", m);
+    const themeMeta = qs('meta[name="theme-color"]');
+    if (themeMeta) {
+      themeMeta.setAttribute("content", m === "dark" ? "#12100e" : "#f8f2ec");
+    }
+    const schemeMeta = qs('meta[name="color-scheme"]');
+    if (schemeMeta) {
+      schemeMeta.setAttribute("content", m === "dark" ? "dark" : "light");
+    }
+    qsa("[data-mode-btn]").forEach((btn) => {
+      const on = btn.getAttribute("data-mode-btn") === m;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    return m;
+  }
+
+  function getStoredMode() {
+    try {
+      return normalizeMode(localStorage.getItem(MODE_KEY) || DEFAULT_MODE);
+    } catch {
+      return DEFAULT_MODE;
+    }
+  }
+
+  function setMode(mode) {
+    const m = applyMode(mode);
+    try {
+      localStorage.setItem(MODE_KEY, m);
+    } catch { /* ignore */ }
+  }
+
+  // apply ASAP (also mirrored by inline head script)
+  applyMode(getStoredMode());
 
   function setActiveNav() {
     const file = (location.pathname.split("/").pop() || "index.html").toLowerCase() || "index.html";
@@ -12,6 +56,15 @@
       const href = (a.getAttribute("href") || "").toLowerCase();
       a.classList.toggle("active", href === file);
     });
+  }
+
+  function initModeToggle() {
+    qsa("[data-mode-btn]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setMode(btn.getAttribute("data-mode-btn"));
+      });
+    });
+    applyMode(getStoredMode());
   }
 
   function initNav() {
@@ -99,6 +152,7 @@
 
   function init() {
     setActiveNav();
+    initModeToggle();
     initNav();
     initReveals();
     initChoices();
