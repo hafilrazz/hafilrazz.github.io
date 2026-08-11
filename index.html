@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="description" content="Hafil Razak — Software Developer, CSE student and AI/ML enthusiast." />
+    <title>Hafil Razak — Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Intro / loading screen -->
+    <div class="intro" id="intro" aria-hidden="true">
+      <button class="skip-intro" id="skipIntro" aria-label="Skip intro">Skip</button>
+      <div class="intro-icons">
+        <button class="round-icon active" aria-label="Developer"><span>&lt;/&gt;</span></button>
+        <button class="round-icon" aria-label="Profile"><span>♙</span></button>
+        <button class="round-icon" aria-label="Web"><span>◎</span></button>
+      </div>
+      <div class="intro-title-wrap">
+        <h1 class="intro-title" aria-hidden="true">Welcome my Portfolio Website</h1>
+      </div>
+      <div class="domain-pill">hafilrazz.dev</div>
+    </div>
+
+    <header class="nav-shell" id="nav" role="banner">
+      <a class="brand" href="#home">hafilrazz.dev</a>
+      <nav role="navigation">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#portfolio" class="nav-link">Portfolio</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+      <button class="mobile-menu" id="mobileMenu" aria-label="Open menu" aria-expanded="false">☰</button>
+    </header>
+
+    <main id="main" role="main">
+      <!-- HERO -->
+      <section class="hero section" id="home" aria-labelledby="home-heading">
+        <div class="hero-copy reveal">
+          <div class="availability"><i class="dot"></i> AVAILABLE FOR WORK</div>
+          <h2 id="home-heading">
+            <span>Software</span>
+            <strong>Developer</strong>
+          </h2>
+
+          <h4 class="hero-to">- <span id="typed"></span></h4>
+
+          <p class="hero-description">
+            I'm <strong>Hafil Razak</strong>, a Computer Science student building
+            modern web applications, AI/ML tools and developer-focused utilities
+            with a pragmatic, design-forward approach.
+          </p>
+
+          <div class="chips">
+            <span>React</span>
+            <span>Python</span>
+            <span>TypeScript</span>
+            <span>Next.js</span>
+          </div>
+
+          <div class="hero-notes">
+            <span>↓ explore my work below</span>
+          </div>
+        </div>
+
+        <aside class="hero-card-wrap reveal" aria-hidden="true">
+          <div class="id-card">
+            <div class="card-top"><span>HR</span><span>DEV / 2026</span></div>
+            <div class="portrait github-portrait">
+              <img src="https://github.com/hafilrazz.png" alt="Hafil Razak GitHub profile" loading="eager" />
+              <div class="portrait-code">&lt;/&gt;</div>
+            </div>
+            <div class="card-bottom"><strong>HAFIL RAZAK</strong><span>SOFTWARE DEVELOPER</span></div>
+          </div>
+        </aside>
+
+        <div class="scroll-cue">SCROLL ↓</div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="about section" id="about" aria-labelledby="about-heading">
+        <div class="section-heading reveal">
+          <h2 id="about-heading">About Me</h2>
+          <p>Building useful software at the intersection of development and AI.</p>
+        </div>
+
+        <div class="about-grid about-hero">
+          <div class="about-left reveal panel">
+            <div class="eyebrow">ABOUT ME</div>
+            <h1 class="big-name">Hafil<br/>Razak</h1>
+            <p class="about-lead">Software developer with a passion for building practical tools and clean, modern web apps. From AI-powered developer utilities to security tooling, I focus on turning ideas into fast, reliable, and well-crafted digital experiences.</p>
+
+            <div class="quote-pill">“Turning ideas into clean, modern, and meaningful digital experiences.”</div>
+
+            <div class="hero-actions">
+              <button class="outline-btn" id="viewProjectsBtn">View Projects</button>
+            </div>
+          </div>
+
+          <div class="about-right">
+            <div class="profile-circle reveal github-portrait">
+              <img src="https://github.com/hafilrazz.png" alt="Hafil Razak portrait" loading="eager" />
+            </div>
+
+            <div class="about-stats reveal">
+              <div class="stat-box" data-key="projects">
+                <div class="stat-number">—</div>
+                <div class="stat-label">Projects</div>
+              </div>
+              <div class="stat-box" data-key="tech">
+                <div class="stat-number">—</div>
+                <div class="stat-label">Tech Stack</div>
+              </div>
+              <div class="stat-box" data-key="open">
+                <div class="stat-number">—</div>
+                <div class="stat-label">Open Source</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section class="portfolio section" id="portfolio" aria-labelledby="portfolio-heading">
+        <div class="section-heading reveal">
+          <h2 id="portfolio-heading">Portfolio Showcase</h2>
+          <p>Explore my journey through projects, technical skills, and GitHub work.</p>
+        </div>
+
+        <div class="tabs reveal" role="tablist">
+          <button class="tab active" data-tab="projects" role="tab" aria-selected="true">Projects</button>
+          <button class="tab" data-tab="tech" role="tab" aria-selected="false">Tech Stack</button>
+        </div>
+
+        <div class="tab-content" id="projectsTab">
+          <div class="projects-grid" id="projectsGrid"></div>
+          <button class="see-more" id="seeMore">⌄ <span>See More</span></button>
+        </div>
+
+        <div class="tab-content hidden" id="techTab">
+          <div class="tech-grid">
+            <div class="tech-group reveal">
+              <span>FRONTEND</span>
+              <div>
+                <b>React</b>
+                <b>Next.js</b>
+                <b>JavaScript</b>
+                <b>HTML</b>
+                <b>CSS</b>
+                <b>Bootstrap</b>
+              </div>
+            </div>
+            <div class="tech-group reveal">
+              <span>BACKEND</span>
+              <div>
+                <b>Node.js</b>
+                <b>Express.js</b>
+                <b>REST APIs</b>
+                <b>Oracle</b>
+                <b>MongoDB</b>
+              </div>
+            </div>
+            <div class="tech-group reveal">
+              <span>AI / ML</span>
+              <div>
+                <b>Python</b>
+                <b>TensorFlow</b>
+                <b>PyTorch</b>
+                <b>scikit-learn</b>
+                <b>OpenCV</b>
+              </div>
+            </div>
+            <div class="tech-group reveal">
+              <span>CLOUD / TOOLS</span>
+              <div>
+                <b>AWS</b>
+                <b>Git</b>
+                <b>GitHub</b>
+                <b>Streamlit</b>
+                <b>Vercel</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GitHub activity section removed per user request -->
+
+      <!-- CONTACT -->
+      <section class="contact section" id="contact" aria-labelledby="contact-heading">
+        <div class="section-heading reveal">
+          <h2 id="contact-heading">Contact Me</h2>
+          <p>Have something in mind? Send a message and let's connect.</p>
+        </div>
+
+        <div class="contact-grid">
+          <aside class="panel contact-card reveal" aria-labelledby="contact-card-heading">
+            <h3 id="contact-card-heading">Get In Touch</h3>
+            <p>Feel free to reach out if you want to collaborate, discuss ideas, or simply say hello.</p>
+
+            <form id="contactForm">
+              <label>
+                <span aria-hidden="true">♙</span>
+                <input name="name" required placeholder="Your Name" aria-label="Your Name" />
+              </label>
+              <label>
+                <span aria-hidden="true">✉</span>
+                <input name="email" type="email" required placeholder="Your Email" aria-label="Your Email" />
+              </label>
+              <label class="message-field">
+                <span aria-hidden="true">□</span>
+                <textarea name="message" required placeholder="Your Message" aria-label="Your Message"></textarea>
+              </label>
+              <button class="primary-btn" type="submit">⌁ &nbsp; Send Message</button>
+            </form>
+
+            <div class="divider"></div>
+            <div class="connect-title">Connect With Me</div>
+            <div class="socials">
+              <a href="https://www.linkedin.com/in/" target="_blank" rel="noopener"><b>in</b><span>LinkedIn<small>@hafilrazz</small></span></a>
+              <a href="https://instagram.com/" target="_blank" rel="noopener"><b>◎</b><span>Instagram<small>@hafilrazz</small></span></a>
+              <a href="https://github.com/hafilrazz" target="_blank" rel="noopener"><b>◉</b><span>Github<small>@hafilrazz</small></span></a>
+            </div>
+          </aside>
+
+          <div class="panel comments-card reveal">
+            <h3>Comments</h3>
+            <p>Leave your thoughts here</p>
+            <form id="commentForm">
+              <input id="commentName" required placeholder="Your Name" aria-label="Your Name" />
+              <textarea id="commentText" required placeholder="Your Comment" aria-label="Your Comment"></textarea>
+              <button class="primary-btn" type="submit">Post Comment</button>
+            </form>
+            <div class="comments-list" id="commentsList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+      <div class="modal panel" role="dialog" aria-modal="true">
+        <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+        <span class="eyebrow" id="modalTech">PROJECT</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalDescription"></p>
+        <div class="modal-tags" id="modalTags"></div>
+        <a id="modalLink" class="primary-btn modal-link" target="_blank" rel="noopener">Open Project ↗</a>
+      </div>
+    </div>
+
+    <footer>
+      <span></span>
+      <span>© 2026 Hafil Razak — All rights reserved.</span>
+      <a href="#home">Back to top ↑</a>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
