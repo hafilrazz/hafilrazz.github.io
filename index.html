@@ -5,25 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Hafil Razak — Software Developer</title>
     <meta name="description" content="Software Developer — tools &amp; web apps." />
+    
+    <!-- Google Fonts: Syne & DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css" />
+    
+    <!-- Critical Inline Styles to prevent FOUC -->
+    <style>
+      :root {
+        --bg-primary: #0d0d0d;
+        --bg-secondary: #141414;
+        --bg-card: #1a1a1a;
+        --border: #2a2a2a;
+        --text-primary: #f0f0f0;
+        --text-secondary: #888888;
+        --text-muted: #555555;
+        --accent: #d4d4d4;
+      }
+      body {
+        background-color: #0d0d0d;
+        color: #f0f0f0;
+        margin: 0;
+        font-family: "Syne", -apple-system, sans-serif;
+        overflow-x: hidden;
+      }
+    </style>
+
+    <!-- Cache-Busted Stylesheet Link for GitHub Pages CDN -->
+    <link rel="stylesheet" href="./styles.css?v=2.0.1" />
   </head>
 
   <body>
-    <!-- Background Atmospheric Grid & Blurred Glow Orbs (Exact Babaswift Style) -->
-    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div class="absolute inset-0">
+    <!-- Background Atmospheric Grid & Blurred Glow Orbs -->
+    <div class="bg-ambient-layer" aria-hidden="true">
+      <div class="bg-orbs-wrap">
         <div class="glow-orb orb-top-left"></div>
         <div class="glow-orb orb-top-right"></div>
         <div class="glow-orb orb-bottom-left"></div>
         <div class="glow-orb orb-bottom-right"></div>
       </div>
-      <div class="absolute inset-0 bg-grid"></div>
+      <div class="bg-grid-layer"></div>
     </div>
 
-    <main style="position: relative; overflow: hidden">
+    <main class="main-content">
       <!-- ================= HERO SECTION (#home) ================= -->
       <section id="home" class="hero-section">
         <!-- Hero Left Content -->
@@ -269,7 +294,7 @@
                     </svg>
                     <div>
                       <p class="social-name">Email</p>
-                      <p class="social-handle">hafilrazz@gmail.com</p>
+                      <p class="social-handle">hafilrazak@gmail.com</p>
                     </div>
                   </div>
                   <div class="social-arrow-btn">
@@ -338,6 +363,7 @@
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Cache-Busted Script Link for GitHub Pages CDN -->
+    <script src="./script.js?v=2.0.1"></script>
   </body>
 </html>

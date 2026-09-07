@@ -4,8 +4,6 @@
    Typography: Syne (Display/Body) + DM Mono (Code/Accents)
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap");
-
 :root {
   --bg-primary: #0d0d0d;
   --bg-secondary: #141414;
@@ -81,13 +79,18 @@ button, input, textarea {
 /* ==========================================================================
    Atmospheric Blurred Background & 26px Grid (Exact BabaSwift Match)
    ========================================================================== */
-.fixed { position: fixed; }
-.absolute { position: absolute; }
-.relative { position: relative; }
-.inset-0 { inset: 0; }
-.-z-10 { z-index: -10; }
-.overflow-hidden { overflow: hidden; }
-.pointer-events-none { pointer-events: none; }
+.bg-ambient-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-orbs-wrap {
+  position: absolute;
+  inset: 0;
+}
 
 .glow-orb {
   position: absolute;
@@ -145,11 +148,19 @@ button, input, textarea {
   }
 }
 
-.bg-grid {
+.bg-grid-layer {
+  position: absolute;
+  inset: 0;
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
   background-size: 26px 26px;
+}
+
+.main-content {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
 /* Glass panel common base */
@@ -760,6 +771,10 @@ button, input, textarea {
   transform: scale(0.97);
 }
 
+.see-more-icon {
+  transition: transform 0.2s ease;
+}
+
 /* ==========================================================================
    Tech Stack Grid (Exact Babaswift 125px x 125px Glass Cards)
    ========================================================================== */
@@ -859,6 +874,10 @@ button, input, textarea {
   gap: 40px;
 }
 
+.contact-left-col, .contact-right-col {
+  width: 100%;
+}
+
 .contact-card, .comments-card {
   border-radius: 28px;
   padding: 32px;
@@ -895,6 +914,10 @@ button, input, textarea {
   position: relative;
   display: flex;
   align-items: center;
+}
+
+.textarea-wrap {
+  align-items: flex-start;
 }
 
 .input-icon {
@@ -1250,6 +1273,11 @@ button, input, textarea {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-actions {
+  display: flex;
+  margin-top: 10px;
 }
 
 .modal-action-btn {
