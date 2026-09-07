@@ -403,11 +403,11 @@ document.addEventListener("keydown", e => {
 
   // 1. Scene, Camera, Renderer
   const scene = new THREE.Scene();
-  const width = container.clientWidth || 400;
-  const height = container.clientHeight || 580;
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
 
   const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-  camera.position.set(0, 0.2, 7.5);
+  camera.position.set(0, 0, 8.5);
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -442,11 +442,14 @@ document.addEventListener("keydown", e => {
   let avatarLoadedImg = null;
   const avatarImg = new Image();
   avatarImg.crossOrigin = "anonymous";
-  avatarImg.src = "https://github.com/hafilrazz.png";
+  avatarImg.src = "./avatar.png";
   avatarImg.onload = () => {
     avatarLoadedImg = avatarImg;
     renderFrontTexture(frontCtx);
     frontTexture.needsUpdate = true;
+  };
+  avatarImg.onerror = () => {
+    avatarImg.src = "https://avatars.githubusercontent.com/u/120009823?v=4";
   };
 
   const frontCanvas = document.createElement("canvas");
@@ -760,11 +763,26 @@ document.addEventListener("keydown", e => {
   cardGroup.add(ringMesh);
   scene.add(cardGroup);
 
+  function getVisibleBounds() {
+    const vFOV = THREE.MathUtils.degToRad(camera.fov);
+    const h = 2 * Math.tan(vFOV / 2) * camera.position.z;
+    const w = h * camera.aspect;
+    return { w, h };
+  }
+
+  function getAnchorPosition() {
+    const bounds = getVisibleBounds();
+    const isMobile = window.innerWidth < 900;
+    const anchorX = isMobile ? 0 : Math.min(3.2, bounds.w * 0.24);
+    const anchorY = isMobile ? 2.0 : 3.8;
+    return new THREE.Vector3(anchorX, anchorY, 0);
+  }
+
   // 5. Dynamic Verlet Physics Rope (Lanyard Strap)
   const ropeSegments = 12;
   const ropeLength = 2.4;
   const segmentLength = ropeLength / ropeSegments;
-  const anchorPos = new THREE.Vector3(0, 3.4, 0);
+  const anchorPos = getAnchorPosition();
 
   const ropeParticles = [];
   for (let i = 0; i <= ropeSegments; i++) {
@@ -840,6 +858,10 @@ document.addEventListener("keydown", e => {
   function onPointerMove(e) {
     updatePointerNdc(e);
     if (!isDragging) {
+      raycaster.setFromCamera(mouseNdc, camera);
+      const intersects = raycaster.intersectObjects([cardMesh, clipMesh, ringMesh], true);
+      canvas.style.cursor = intersects.length > 0 ? "grab" : "default";
+
       // Gentle hover parallax tilt
       targetParallax.x = mouseNdc.x * 0.35;
       targetParallax.y = mouseNdc.y * 0.25;
@@ -849,11 +871,13 @@ document.addEventListener("keydown", e => {
     raycaster.setFromCamera(mouseNdc, camera);
     const hitPoint = new THREE.Vector3();
     if (raycaster.ray.intersectPlane(dragPlane, hitPoint)) {
-      targetPoint.copy(hitPoint).add(grabOffset);
-      // Constrain dragging bounds
-      targetPoint.x = Math.max(-3.5, Math.min(3.5, targetPoint.x));
-      targetPoint.y = Math.max(-2.5, Math.min(2.5, targetPoint.y));
-      targetPoint.z = Math.max(-1.5, Math.min(2.0, targetPoint.z));
+      const bounds = getVisibleBounds();
+      // Allow dragging across the entire screen with zero box constraints!
+      const maxDragX = bounds.w * 0.48;
+      const maxDragY = bounds.h * 0.48;
+      targetPoint.x = Math.max(-maxDragX, Math.min(maxDragX, hitPoint.x + grabOffset.x));
+      targetPoint.y = Math.max(-maxDragY, Math.min(maxDragY, hitPoint.y + grabOffset.y));
+      targetPoint.z = Math.max(-2.5, Math.min(2.5, hitPoint.z + grabOffset.z));
     }
   }
 
@@ -983,11 +1007,15 @@ document.addEventListener("keydown", e => {
 
   // 9. Resize Handling
   function onResize() {
-    const newW = container.clientWidth || 380;
-    const newH = container.clientHeight || 560;
+    const newW = container.clientWidth || window.innerWidth;
+    const newH = container.clientHeight || window.innerHeight;
     camera.aspect = newW / newH;
     camera.updateProjectionMatrix();
     renderer.setSize(newW, newH);
+
+    const newAnchor = getAnchorPosition();
+    anchorPos.copy(newAnchor);
+    ropeParticles[0].pos.copy(anchorPos);
   }
   window.addEventListener("resize", onResize);
 
