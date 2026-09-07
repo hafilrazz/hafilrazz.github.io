@@ -331,63 +331,641 @@ document.addEventListener("keydown", e => {
   tick();
 })();
 
-// Hanging Lanyard Card 3D Tilt & Drag Physics
+// ============================================================================
+// 3D WebGL Physics Lanyard Model (Three.js) — Exact Reference Recreation
+// ============================================================================
 (() => {
-  const cardWrap = document.getElementById("heroLanyardWrap");
-  const card = document.getElementById("lanyardCard");
-  if (!cardWrap || !card) return;
+  const canvas = document.getElementById("lanyardCanvas3d");
+  const fallbackWrap = document.getElementById("lanyardFallback");
+  const container = document.getElementById("heroLanyardWrap");
+  if (!canvas || !container) return;
 
-  let dragging = false;
-  let startX = 0, startY = 0, pointerId = null;
+  // Fallback check: if WebGL is unavailable or Three.js fails to load
+  if (typeof THREE === "undefined") {
+    if (fallbackWrap) fallbackWrap.style.display = "block";
+    canvas.style.display = "none";
+    return;
+  }
 
-  // Responsive mouse tilt
-  window.addEventListener("mousemove", e => {
-    if (dragging) return;
-    const rect = cardWrap.getBoundingClientRect();
-    // Center point of the card
-    const cardCenterX = rect.left + rect.width / 2;
-    const cardCenterY = rect.top + rect.height / 2;
+  // Detect WebGL capability
+  try {
+    const testCanvas = document.createElement("canvas");
+    const gl = testCanvas.getContext("webgl") || testCanvas.getContext("experimental-webgl");
+    if (!gl) throw new Error("No WebGL");
+  } catch (_) {
+    if (fallbackWrap) fallbackWrap.style.display = "block";
+    canvas.style.display = "none";
+    return;
+  }
 
-    const deltaX = (e.clientX - cardCenterX) / (window.innerWidth / 2);
-    const deltaY = (e.clientY - cardCenterY) / (window.innerHeight / 2);
+  // 1. Scene, Camera, Renderer
+  const scene = new THREE.Scene();
+  const width = container.clientWidth || 400;
+  const height = container.clientHeight || 580;
 
-    const rotateX = -deltaY * 12;
-    const rotateY = deltaX * 14;
-    const rotateZ = -2 + deltaX * 3;
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  camera.position.set(0, 0.2, 7.5);
 
-    card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) rotateZ(${rotateZ.toFixed(2)}deg)`;
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: "high-performance"
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(width, height);
+  if (renderer.toneMapping !== undefined) {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+  }
+
+  // 2. Lighting (Dynamic studio illumination)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  keyLight.position.set(4, 6, 5);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0xa0b0ff, 0.7);
+  fillLight.position.set(-5, -2, 4);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.PointLight(0xffffff, 1.3, 25);
+  rimLight.position.set(0, 4, -4);
+  scene.add(rimLight);
+
+  // 3. High-Resolution Procedural Texture Generation for Front & Back
+  let avatarLoadedImg = null;
+  const avatarImg = new Image();
+  avatarImg.crossOrigin = "anonymous";
+  avatarImg.src = "https://github.com/hafilrazz.png";
+  avatarImg.onload = () => {
+    avatarLoadedImg = avatarImg;
+    renderFrontTexture(frontCtx);
+    frontTexture.needsUpdate = true;
+  };
+
+  const frontCanvas = document.createElement("canvas");
+  frontCanvas.width = 1024;
+  frontCanvas.height = 1600;
+  const frontCtx = frontCanvas.getContext("2d");
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function renderFrontTexture(ctx) {
+    const W = 1024, H = 1600;
+    ctx.clearRect(0, 0, W, H);
+
+    // Card Body Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    bgGrad.addColorStop(0, "#161618");
+    bgGrad.addColorStop(0.5, "#101012");
+    bgGrad.addColorStop(1, "#18181c");
+    ctx.fillStyle = bgGrad;
+    roundRect(ctx, 16, 16, W - 32, H - 32, 64);
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
+    ctx.lineWidth = 10;
+    roundRect(ctx, 20, 20, W - 40, H - 40, 60);
+    ctx.stroke();
+
+    // Inner glow border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.lineWidth = 20;
+    roundRect(ctx, 35, 35, W - 70, H - 70, 50);
+    ctx.stroke();
+
+    // Top Header: Chip badge & DEV.2026
+    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+    roundRect(ctx, 60, 70, 220, 56, 28);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Green chip dot
+    ctx.fillStyle = "#10b981";
+    ctx.beginPath();
+    ctx.arc(88, 98, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#f0f0f0";
+    ctx.font = "bold 22px 'DM Mono', monospace";
+    ctx.fillText("HR // DEV", 112, 105);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.font = "bold 24px 'DM Mono', monospace";
+    ctx.textAlign = "right";
+    ctx.fillText("DEV.2026", W - 64, 105);
+    ctx.textAlign = "left";
+
+    // Avatar Center Box (Y: 180 to 760)
+    const avX = W / 2, avY = 460, avR = 210;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+    ctx.clip();
+
+    if (avatarLoadedImg) {
+      ctx.drawImage(avatarLoadedImg, avX - avR, avY - avR, avR * 2, avR * 2);
+    } else {
+      ctx.fillStyle = "#222228";
+      ctx.fillRect(avX - avR, avY - avR, avR * 2, avR * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 140px 'Syne', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("HR", avX, avY);
+    }
+    ctx.restore();
+
+    // Avatar border ring
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Green Online Badge on Avatar
+    const statusX = avX + avR * 0.65, statusY = avY + avR * 0.65;
+    ctx.fillStyle = "#22c55e";
+    ctx.beginPath();
+    ctx.arc(statusX, statusY, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#101012";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // Name & Role (Y: 760 to 920)
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 68px 'Syne', sans-serif";
+    ctx.fillText("HAFIL RAZAK", W / 2, 790);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.font = "500 26px 'DM Mono', monospace";
+    ctx.fillText("SOFTWARE DEVELOPER • CSE", W / 2, 840);
+
+    // Separator line
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(80, 890);
+    ctx.lineTo(W - 80, 890);
+    ctx.stroke();
+
+    // Tech Tags row (Y: 930 to 1020)
+    const pills = ["AI / ML", "FULL STACK", "OPEN SOURCE"];
+    const pillW = 260, pillH = 64, gap = 30;
+    const startPillX = (W - (pills.length * pillW + (pills.length - 1) * gap)) / 2;
+    pills.forEach((p, i) => {
+      const px = startPillX + i * (pillW + gap);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+      roundRect(ctx, px, 940, pillW, pillH, 32);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.font = "600 24px 'DM Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(p, px + pillW / 2, 980);
+    });
+
+    // Bio / Description block (Y: 1040 to 1240)
+    ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+    roundRect(ctx, 70, 1040, W - 140, 200, 32);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+    ctx.font = "400 26px 'Syne', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Crafting modern web apps & tools with high", W / 2, 1110);
+    ctx.fillText("reliability, clean code, and intuitive UX.", W / 2, 1160);
+    ctx.fillText("Open to full-time & freelance projects.", W / 2, 1210);
+
+    // Bottom Meta Bar (Y: 1300 to 1520)
+    ctx.textAlign = "left";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.font = "bold 28px 'DM Mono', monospace";
+    ctx.fillText("#8842-ACTIVE", 80, 1400);
+
+    // Verified badge
+    ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+    roundRect(ctx, 80, 1430, 190, 52, 26);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(16, 185, 129, 0.35)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = "#10b981";
+    ctx.font = "bold 22px 'DM Mono', monospace";
+    ctx.fillText("✓ VERIFIED", 106, 1464);
+
+    // Stylized Barcode on bottom right
+    const barX = W - 280, barY = 1380, barH = 100;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+    const barWidths = [4, 12, 6, 16, 8, 4, 14, 8, 18, 4, 8, 12, 6, 14, 4, 10, 16, 8];
+    let curBx = barX;
+    barWidths.forEach(bw => {
+      ctx.fillRect(curBx, barY, bw, barH);
+      curBx += bw + 6;
+    });
+  }
+
+  // Back Texture Canvas
+  const backCanvas = document.createElement("canvas");
+  backCanvas.width = 1024;
+  backCanvas.height = 1600;
+  const backCtx = backCanvas.getContext("2d");
+
+  function renderBackTexture(ctx) {
+    const W = 1024, H = 1600;
+    ctx.clearRect(0, 0, W, H);
+
+    // Carbon / Obsidian Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    bgGrad.addColorStop(0, "#111113");
+    bgGrad.addColorStop(0.5, "#0b0b0d");
+    bgGrad.addColorStop(1, "#141418");
+    ctx.fillStyle = bgGrad;
+    roundRect(ctx, 16, 16, W - 32, H - 32, 64);
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
+    ctx.lineWidth = 10;
+    roundRect(ctx, 20, 20, W - 40, H - 40, 60);
+    ctx.stroke();
+
+    // Dot grid texture
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    for (let x = 60; x < W - 60; x += 36) {
+      for (let y = 60; y < H - 60; y += 36) {
+        ctx.beginPath();
+        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Holographic horizontal security ribbon
+    const holoGrad = ctx.createLinearGradient(0, 680, W, 780);
+    holoGrad.addColorStop(0, "rgba(236, 72, 153, 0.25)");
+    holoGrad.addColorStop(0.25, "rgba(168, 85, 247, 0.25)");
+    holoGrad.addColorStop(0.5, "rgba(59, 130, 246, 0.25)");
+    holoGrad.addColorStop(0.75, "rgba(16, 185, 129, 0.25)");
+    holoGrad.addColorStop(1, "rgba(234, 179, 8, 0.25)");
+    ctx.fillStyle = holoGrad;
+    ctx.fillRect(20, 680, W - 40, 140);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.font = "bold 32px 'DM Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("✦ HAFIL RAZAK // VERIFIED DEV SPECIFICATION ✦", W / 2, 762);
+
+    // Large Monogram "HR" in center
+    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+    ctx.font = "800 240px 'Syne', sans-serif";
+    ctx.fillText("HR", W / 2, 520);
+
+    // NFC Wireless Icon
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.lineWidth = 6;
+    for (let r = 30; r <= 90; r += 24) {
+      ctx.beginPath();
+      ctx.arc(W / 2, 1100, r, -Math.PI * 0.75, -Math.PI * 0.25);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.font = "600 22px 'DM Mono', monospace";
+    ctx.fillText("CONTACTLESS DEV ID", W / 2, 1180);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.font = "400 20px 'DM Mono', monospace";
+    ctx.fillText("PROPERTY OF HAFIL RAZAK // GITHUB.COM/HAFILRAZZ", W / 2, 1480);
+  }
+
+  renderFrontTexture(frontCtx);
+  renderBackTexture(backCtx);
+
+  const frontTexture = new THREE.CanvasTexture(frontCanvas);
+  const backTexture = new THREE.CanvasTexture(backCanvas);
+  frontTexture.anisotropy = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 8;
+  backTexture.anisotropy = frontTexture.anisotropy;
+
+  // 4. Build 3D Card Mesh
+  const cardW = 2.4, cardH = 3.75, cardD = 0.04;
+  const edgeMat = new THREE.MeshStandardMaterial({
+    color: 0x1f1f23,
+    metalness: 0.8,
+    roughness: 0.3
+  });
+  const frontMat = new THREE.MeshStandardMaterial({
+    map: frontTexture,
+    roughness: 0.25,
+    metalness: 0.12
+  });
+  const backMat = new THREE.MeshStandardMaterial({
+    map: backTexture,
+    roughness: 0.28,
+    metalness: 0.18
   });
 
-  // Pointer drag micro-interaction
-  function onDown(e) {
-    dragging = true;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startY = e.clientY;
-    cardWrap.setPointerCapture(pointerId);
-    card.style.transition = "none";
+  const cardGeo = new THREE.BoxGeometry(cardW, cardH, cardD);
+  const cardMesh = new THREE.Mesh(cardGeo, [
+    edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat
+  ]);
+  cardMesh.position.set(0, -cardH / 2, 0); // pivot at top center
+
+  // Chrome Clip & Swivel Ring
+  const chromeMat = new THREE.MeshStandardMaterial({
+    color: 0xd8d8de,
+    metalness: 0.95,
+    roughness: 0.12
+  });
+  const clipGeo = new THREE.BoxGeometry(0.32, 0.22, 0.08);
+  const clipMesh = new THREE.Mesh(clipGeo, chromeMat);
+  clipMesh.position.set(0, 0, 0);
+
+  const ringGeo = new THREE.TorusGeometry(0.12, 0.03, 16, 24);
+  const ringMesh = new THREE.Mesh(ringGeo, chromeMat);
+  ringMesh.position.set(0, 0.14, 0);
+
+  // Group containing the hanging card
+  const cardGroup = new THREE.Group();
+  cardGroup.add(cardMesh);
+  cardGroup.add(clipMesh);
+  cardGroup.add(ringMesh);
+  scene.add(cardGroup);
+
+  // 5. Dynamic Verlet Physics Rope (Lanyard Strap)
+  const ropeSegments = 12;
+  const ropeLength = 2.4;
+  const segmentLength = ropeLength / ropeSegments;
+  const anchorPos = new THREE.Vector3(0, 3.4, 0);
+
+  const ropeParticles = [];
+  for (let i = 0; i <= ropeSegments; i++) {
+    const p = new THREE.Vector3(
+      anchorPos.x,
+      anchorPos.y - i * segmentLength,
+      anchorPos.z
+    );
+    ropeParticles.push({
+      pos: p.clone(),
+      oldPos: p.clone(),
+      pinned: i === 0
+    });
   }
 
-  function onMove(e) {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    const rot = Math.max(Math.min(dx / 12, 18), -18);
-    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+  // Rope Tube Geometry & Mesh
+  const strapMat = new THREE.MeshStandardMaterial({
+    color: 0x1e1e24,
+    roughness: 0.8,
+    metalness: 0.05
+  });
+
+  let ropeCurve = new THREE.CatmullRomCurve3(ropeParticles.map(p => p.pos));
+  let ropeGeo = new THREE.TubeGeometry(ropeCurve, 32, 0.038, 8, false);
+  const ropeMesh = new THREE.Mesh(ropeGeo, strapMat);
+  scene.add(ropeMesh);
+
+  // 6. Physics Simulation State
+  let cardPos = ropeParticles[ropeSegments].pos.clone();
+  let cardVel = new THREE.Vector3(0, 0, 0);
+  let cardRot = new THREE.Euler(0, 0, 0, "YXZ");
+  let cardRotVel = new THREE.Vector3(0, 0, 0);
+
+  let isDragging = false;
+  let targetPoint = new THREE.Vector3();
+  const raycaster = new THREE.Raycaster();
+  const mouseNdc = new THREE.Vector2();
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+  let grabOffset = new THREE.Vector3();
+
+  // 7. Event Handlers
+  function updatePointerNdc(e) {
+    const rect = canvas.getBoundingClientRect();
+    mouseNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
   }
 
-  function onUp() {
-    if (!dragging) return;
-    dragging = false;
-    try { cardWrap.releasePointerCapture(pointerId); } catch (_) {}
-    card.style.transition = "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)";
-    card.style.transform = "perspective(1000px) translate(0, 0) rotate(-2deg)";
+  function onPointerDown(e) {
+    updatePointerNdc(e);
+    raycaster.setFromCamera(mouseNdc, camera);
+    const intersects = raycaster.intersectObjects([cardMesh, clipMesh, ringMesh], true);
+
+    if (intersects.length > 0) {
+      isDragging = true;
+      canvas.classList.add("grabbing");
+      canvas.setPointerCapture(e.pointerId);
+
+      // Intersection plane at current card depth
+      dragPlane.setFromNormalAndCoplanarPoint(
+        camera.getWorldDirection(new THREE.Vector3()).negate(),
+        cardGroup.position
+      );
+
+      const hitPoint = new THREE.Vector3();
+      raycaster.ray.intersectPlane(dragPlane, hitPoint);
+      grabOffset.copy(cardGroup.position).sub(hitPoint);
+    }
   }
 
-  cardWrap.addEventListener("pointerdown", onDown);
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp);
-  cardWrap.addEventListener("pointercancel", onUp);
+  const targetParallax = new THREE.Vector2(0, 0);
+  const currentParallax = new THREE.Vector2(0, 0);
+
+  function onPointerMove(e) {
+    updatePointerNdc(e);
+    if (!isDragging) {
+      // Gentle hover parallax tilt
+      targetParallax.x = mouseNdc.x * 0.35;
+      targetParallax.y = mouseNdc.y * 0.25;
+      return;
+    }
+
+    raycaster.setFromCamera(mouseNdc, camera);
+    const hitPoint = new THREE.Vector3();
+    if (raycaster.ray.intersectPlane(dragPlane, hitPoint)) {
+      targetPoint.copy(hitPoint).add(grabOffset);
+      // Constrain dragging bounds
+      targetPoint.x = Math.max(-3.5, Math.min(3.5, targetPoint.x));
+      targetPoint.y = Math.max(-2.5, Math.min(2.5, targetPoint.y));
+      targetPoint.z = Math.max(-1.5, Math.min(2.0, targetPoint.z));
+    }
+  }
+
+  function onPointerUp(e) {
+    if (isDragging) {
+      isDragging = false;
+      canvas.classList.remove("grabbing");
+      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      
+      // Impart rotation twist impulse based on velocity
+      cardRotVel.y += (cardVel.x * 1.5);
+      cardRotVel.x -= (cardVel.y * 1.2);
+    }
+  }
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+  canvas.addEventListener("pointercancel", onPointerUp);
+
+  // 8. Animation & Physics Loop
+  let lastTime = performance.now();
+  let animId = null;
+  let isVisible = true;
+
+  function updatePhysics(dt) {
+    dt = Math.min(dt, 0.033); // clamp dt
+
+    // Card movement
+    if (isDragging) {
+      const prevPos = cardPos.clone();
+      cardPos.lerp(targetPoint, 0.3);
+      cardVel.copy(cardPos).sub(prevPos).divideScalar(dt || 0.016);
+
+      // Tilt while dragging
+      const targetRotZ = -cardVel.x * 0.08;
+      const targetRotX = cardVel.y * 0.06;
+      cardRot.z += (targetRotZ - cardRot.z) * 0.2;
+      cardRot.x += (targetRotX - cardRot.x) * 0.2;
+    } else {
+      // Natural pendulum & spring physics
+      const gravity = new THREE.Vector3(0, -9.8, 0);
+      cardVel.addScaledVector(gravity, dt);
+
+      // Spring / string tension pulling toward anchor
+      const toAnchor = anchorPos.clone().sub(cardPos);
+      const dist = toAnchor.length();
+      if (dist > ropeLength) {
+        const stretch = dist - ropeLength;
+        const springForce = toAnchor.normalize().multiplyScalar(stretch * 45);
+        cardVel.addScaledVector(springForce, dt);
+      }
+
+      // Air resistance / damping
+      cardVel.multiplyScalar(0.975);
+      cardPos.addScaledVector(cardVel, dt);
+
+      // Angular physics
+      currentParallax.lerp(targetParallax, 0.05);
+
+      // Restoring torque (align upright)
+      const targetZ = currentParallax.x * 0.2;
+      const targetX = currentParallax.y * 0.2;
+      cardRotVel.z += (targetZ - cardRot.z) * 20 * dt;
+      cardRotVel.x += (targetX - cardRot.x) * 20 * dt;
+      cardRotVel.y += (0 - cardRot.y) * 8 * dt;
+
+      cardRotVel.multiplyScalar(0.96);
+      cardRot.x += cardRotVel.x * dt;
+      cardRot.y += cardRotVel.y * dt;
+      cardRot.z += cardRotVel.z * dt;
+
+      // Subtle breathing float when at rest
+      const time = performance.now() * 0.002;
+      cardPos.y += Math.sin(time) * 0.0008;
+    }
+
+    // Attach cardGroup
+    cardGroup.position.copy(cardPos);
+    cardGroup.rotation.set(cardRot.x, cardRot.y, cardRot.z);
+
+    // Verlet integration for Rope
+    ropeParticles[0].pos.copy(anchorPos);
+    ropeParticles[ropeSegments].pos.copy(cardPos);
+
+    for (let i = 1; i < ropeSegments; i++) {
+      const p = ropeParticles[i];
+      const vel = p.pos.clone().sub(p.oldPos).multiplyScalar(0.94);
+      p.oldPos.copy(p.pos);
+      p.pos.add(vel);
+      p.pos.y -= 9.8 * 0.5 * dt * dt;
+    }
+
+    // Relax rope distance constraints (6 iterations)
+    for (let iter = 0; iter < 6; iter++) {
+      for (let i = 0; i < ropeSegments; i++) {
+        const p1 = ropeParticles[i];
+        const p2 = ropeParticles[i + 1];
+        const delta = p2.pos.clone().sub(p1.pos);
+        const curDist = delta.length() || 0.0001;
+        const diff = (curDist - segmentLength) / curDist;
+        const adjust = delta.multiplyScalar(0.5 * diff);
+
+        if (!p1.pinned) p1.pos.add(adjust);
+        if (i + 1 !== ropeSegments) p2.pos.sub(adjust);
+      }
+    }
+
+    // Update Rope Mesh
+    ropeCurve = new THREE.CatmullRomCurve3(ropeParticles.map(p => p.pos));
+    ropeGeo.dispose();
+    ropeGeo = new THREE.TubeGeometry(ropeCurve, 32, 0.038, 8, false);
+    ropeMesh.geometry = ropeGeo;
+  }
+
+  function animate(now) {
+    if (!isVisible) return;
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
+
+    updatePhysics(dt);
+    renderer.render(scene, camera);
+    animId = requestAnimationFrame(animate);
+  }
+
+  animId = requestAnimationFrame(animate);
+
+  // 9. Resize Handling
+  function onResize() {
+    const newW = container.clientWidth || 380;
+    const newH = container.clientHeight || 560;
+    camera.aspect = newW / newH;
+    camera.updateProjectionMatrix();
+    renderer.setSize(newW, newH);
+  }
+  window.addEventListener("resize", onResize);
+
+  // 10. Pause rendering when not visible
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!isVisible) {
+            isVisible = true;
+            lastTime = performance.now();
+            animId = requestAnimationFrame(animate);
+          }
+        } else {
+          isVisible = false;
+          if (animId) cancelAnimationFrame(animId);
+        }
+      });
+    }, { threshold: 0.05 });
+    observer.observe(canvas);
+  }
 })();
 
 // Contact Form Submission (Mailto Handler)

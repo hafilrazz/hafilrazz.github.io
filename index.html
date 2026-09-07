@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     
+    <!-- Three.js for 3D Interactive Lanyard Model -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <!-- Critical Inline Styles to prevent FOUC -->
     <style>
       :root {
@@ -33,7 +36,7 @@
     </style>
 
     <!-- Cache-Busted Stylesheet Link for GitHub Pages CDN -->
-    <link rel="stylesheet" href="./styles.css?v=2.0.1" />
+    <link rel="stylesheet" href="./styles.css?v=2.1.0" />
   </head>
 
   <body>
@@ -85,48 +88,54 @@
           </div>
         </div>
 
-        <!-- Hero Right Side: Interactive 3D Physics Lanyard Badge -->
-        <div class="hero-lanyard-container" id="heroLanyardWrap" aria-label="Interactive ID Badge">
-          <div class="lanyard-hanger">
-            <div class="lanyard-cord"></div>
-            <div class="lanyard-metal-clip"></div>
-          </div>
+        <!-- Hero Right Side: Interactive 3D Physics Lanyard Badge Model -->
+        <div class="hero-lanyard-container" id="heroLanyardWrap" aria-label="Interactive 3D ID Badge">
+          <canvas id="lanyardCanvas3d" class="lanyard-canvas-3d"></canvas>
           
-          <div class="lanyard-card" id="lanyardCard">
-            <div class="card-sheen" aria-hidden="true"></div>
+          <!-- Fallback CSS Card (displayed only if WebGL is unavailable) -->
+          <div class="lanyard-fallback-wrap" id="lanyardFallback" style="display: none;">
+            <div class="lanyard-hanger">
+              <div class="lanyard-cord"></div>
+              <div class="lanyard-metal-clip"></div>
+            </div>
             
-            <div class="card-top-row">
-              <div class="card-chip-badge">
-                <span class="chip-dot"></span>
-                <span>HR // DEV</span>
-              </div>
-              <span class="card-year">DEV.2026</span>
-            </div>
-
-            <div class="card-avatar-box">
-              <img src="https://github.com/hafilrazz.png" alt="Hafil Razak portrait" class="card-avatar-img" />
-              <div class="card-status-dot" title="Available"></div>
-            </div>
-
-            <div class="card-bottom-row">
-              <div class="card-name-block">
-                <strong>HAFIL RAZAK</strong>
-                <span>SOFTWARE DEVELOPER &bull; CSE</span>
+            <div class="lanyard-card" id="lanyardCard">
+              <div class="card-sheen" aria-hidden="true"></div>
+              
+              <div class="card-top-row">
+                <div class="card-chip-badge">
+                  <span class="chip-dot"></span>
+                  <span>HR // DEV</span>
+                </div>
+                <span class="card-year">DEV.2026</span>
               </div>
 
-              <div class="card-tags-row">
-                <span>AI/ML</span>
-                <span>FULL STACK</span>
-                <span>OPEN SOURCE</span>
+              <div class="card-avatar-box">
+                <img src="https://github.com/hafilrazz.png" alt="Hafil Razak portrait" class="card-avatar-img" />
+                <div class="card-status-dot" title="Available"></div>
               </div>
 
-              <div class="card-meta-line">
-                <span>#8842-ACTIVE</span>
-                <span class="meta-verified">VERIFIED</span>
+              <div class="card-bottom-row">
+                <div class="card-name-block">
+                  <strong>HAFIL RAZAK</strong>
+                  <span>SOFTWARE DEVELOPER &bull; CSE</span>
+                </div>
+
+                <div class="card-tags-row">
+                  <span>AI/ML</span>
+                  <span>FULL STACK</span>
+                  <span>OPEN SOURCE</span>
+                </div>
+
+                <div class="card-meta-line">
+                  <span>#8842-ACTIVE</span>
+                  <span class="meta-verified">VERIFIED</span>
+                </div>
               </div>
             </div>
           </div>
-          <span class="card-hint">✦ Drag or swing card</span>
+
+          <span class="card-hint">✦ Grab &amp; swing 3D card</span>
         </div>
 
         <!-- Bottom Scroll Indicator -->
@@ -364,6 +373,6 @@
     </div>
 
     <!-- Cache-Busted Script Link for GitHub Pages CDN -->
-    <script src="./script.js?v=2.0.1"></script>
+    <script src="./script.js?v=2.1.0"></script>
   </body>
 </html>
