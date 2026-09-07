@@ -9,6 +9,49 @@
  * - Contact form and interactive guestbook with persistent likes
  */
 
+// ============================================================================
+// Full-Screen Intro Splash Screen Controller (Exact BabaSwift Match)
+// ============================================================================
+(() => {
+  const intro = document.getElementById("introOverlay");
+  if (!intro) return;
+
+  const currentHash = window.location.hash;
+  const currentPath = window.location.pathname;
+  const navEntries = performance.getEntriesByType("navigation");
+  const isReload = navEntries.length > 0 && navEntries[0].type === "reload";
+
+  // If user refreshed/reloaded the page, reset session flags so intro plays (same as BabaSwift)
+  if (isReload) {
+    sessionStorage.removeItem("introPlayed");
+    sessionStorage.removeItem("heroPlayed");
+    if (currentHash) history.replaceState(null, "", currentPath);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  // If navigating directly to a section with hash (e.g. #portfolio, #contact), skip intro
+  if (currentHash === "#portfolio" || currentHash === "#contact") {
+    intro.classList.add("done");
+    return;
+  }
+
+  // If intro has already played in this browser session, skip immediately
+  if (sessionStorage.getItem("introPlayed") === "true") {
+    intro.classList.add("done");
+    return;
+  }
+
+  // Play intro sequence: after 2.8s, slide up smoothly over 1.2s
+  setTimeout(() => {
+    intro.classList.add("exit");
+    sessionStorage.setItem("introPlayed", "true");
+
+    setTimeout(() => {
+      intro.classList.add("done");
+    }, 1250);
+  }, 2800);
+})();
+
 const GITHUB_USER = "hafilrazz";
 
 // Fallback & Curated Projects

@@ -77,6 +77,185 @@ button, input, textarea {
 }
 
 /* ==========================================================================
+   Full-Screen Intro Splash Screen (Exact BabaSwift Match)
+   ========================================================================== */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  overflow: hidden;
+  padding: 20px;
+  transition: transform 1.2s cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: transform;
+}
+
+.intro-overlay.exit {
+  transform: translateY(-100%);
+}
+
+.intro-overlay.done {
+  display: none !important;
+}
+
+.intro-card {
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+  user-select: none;
+}
+
+.intro-icons {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(60px) scale(0.3) rotate(-140deg);
+  animation: iconEnter 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+             iconBob 3.5s ease-in-out infinite 1.8s;
+}
+
+.intro-icon-badge.badge-1 {
+  animation-delay: 0.15s, 1.8s;
+}
+.intro-icon-badge.badge-2 {
+  animation-delay: 0.45s, 2.1s;
+}
+.intro-icon-badge.badge-3 {
+  animation-delay: 0.75s, 2.4s;
+}
+
+@keyframes iconEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes iconBob {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+}
+
+.intro-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.intro-heading-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.intro-welcome {
+  font-size: clamp(20px, 3.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  font-family: "Syne", sans-serif;
+  color: #ffffff;
+  opacity: 0;
+  transform: translateX(120px);
+  animation: textSlideIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+}
+
+.intro-to-my {
+  font-size: clamp(20px, 3.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  font-family: "Syne", sans-serif;
+  color: #a1a1aa;
+  opacity: 0;
+  transform: translateX(-120px);
+  animation: textSlideIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1.15s forwards;
+}
+
+.intro-title {
+  font-size: clamp(20px, 3.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-family: "Syne", sans-serif;
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(70px);
+  animation: titleSlideUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1.4s forwards;
+}
+
+@keyframes textSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes titleSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro-domain-pill {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transform: translateY(-40px);
+  animation: pillSlideDown 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1.65s forwards;
+}
+
+@keyframes pillSlideDown {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
    Atmospheric Blurred Background & 26px Grid (Exact BabaSwift Match)
    ========================================================================== */
 .bg-ambient-layer {
