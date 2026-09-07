@@ -442,15 +442,20 @@ document.addEventListener("keydown", e => {
   let avatarLoadedImg = null;
   const avatarImg = new Image();
   avatarImg.crossOrigin = "anonymous";
-  avatarImg.src = "./avatar.png";
   avatarImg.onload = () => {
     avatarLoadedImg = avatarImg;
     renderFrontTexture(frontCtx);
     frontTexture.needsUpdate = true;
   };
   avatarImg.onerror = () => {
-    avatarImg.src = "https://avatars.githubusercontent.com/u/120009823?v=4";
+    if (avatarImg.src !== "https://avatars.githubusercontent.com/u/120009823?v=4") {
+      avatarImg.src = "https://avatars.githubusercontent.com/u/120009823?v=4";
+    }
   };
+  avatarImg.src = "./avatar.png";
+  if (avatarImg.complete && avatarImg.naturalWidth > 0) {
+    avatarLoadedImg = avatarImg;
+  }
 
   const frontCanvas = document.createElement("canvas");
   frontCanvas.width = 1024;
@@ -475,167 +480,99 @@ document.addEventListener("keydown", e => {
     const W = 1024, H = 1600;
     ctx.clearRect(0, 0, W, H);
 
-    // Card Body Gradient
+    // Card Body Gradient (Sleek dark obsidian / glass)
     const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-    bgGrad.addColorStop(0, "#161618");
-    bgGrad.addColorStop(0.5, "#101012");
+    bgGrad.addColorStop(0, "#141416");
+    bgGrad.addColorStop(0.5, "#0e0e10");
     bgGrad.addColorStop(1, "#18181c");
     ctx.fillStyle = bgGrad;
     roundRect(ctx, 16, 16, W - 32, H - 32, 64);
     ctx.fill();
 
-    // Border
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
-    ctx.lineWidth = 10;
+    // Outer Border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
+    ctx.lineWidth = 8;
     roundRect(ctx, 20, 20, W - 40, H - 40, 60);
     ctx.stroke();
 
     // Inner glow border
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-    ctx.lineWidth = 20;
-    roundRect(ctx, 35, 35, W - 70, H - 70, 50);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
+    ctx.lineWidth = 16;
+    roundRect(ctx, 32, 32, W - 64, H - 64, 52);
     ctx.stroke();
 
-    // Top Header: Chip badge & DEV.2026
-    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-    roundRect(ctx, 60, 70, 220, 56, 28);
+    // Top punch slot hole for lanyard clip (Physical ID Card detail)
+    const holeW = 130, holeH = 28, holeR = 14;
+    const holeX = (W - holeW) / 2, holeY = 52;
+    ctx.fillStyle = "#070709";
+    roundRect(ctx, holeX, holeY, holeW, holeH, holeR);
     ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+    ctx.lineWidth = 3;
+    roundRect(ctx, holeX, holeY, holeW, holeH, holeR);
     ctx.stroke();
 
-    // Green chip dot
-    ctx.fillStyle = "#10b981";
-    ctx.beginPath();
-    ctx.arc(88, 98, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#f0f0f0";
-    ctx.font = "bold 22px 'DM Mono', monospace";
-    ctx.fillText("HR // DEV", 112, 105);
-
-    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
-    ctx.font = "bold 24px 'DM Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText("DEV.2026", W - 64, 105);
-    ctx.textAlign = "left";
-
-    // Avatar Center Box (Y: 180 to 760)
-    const avX = W / 2, avY = 460, avR = 210;
+    // Profile Photo Frame (Occupies the central & prominent portion of the card)
+    const photoX = 48, photoY = 112, photoW = W - 96, photoH = H - 160, photoR = 46;
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+    roundRect(ctx, photoX, photoY, photoW, photoH, photoR);
     ctx.clip();
 
     if (avatarLoadedImg) {
-      ctx.drawImage(avatarLoadedImg, avX - avR, avY - avR, avR * 2, avR * 2);
+      // Cover fit calculation to preserve exact aspect ratio without stretching
+      const imgW = avatarLoadedImg.naturalWidth || avatarLoadedImg.width || 1;
+      const imgH = avatarLoadedImg.naturalHeight || avatarLoadedImg.height || 1;
+      const imgRatio = imgW / imgH;
+      const boxRatio = photoW / photoH;
+      let sW, sH, sX, sY;
+      if (imgRatio > boxRatio) {
+        sH = imgH;
+        sW = sH * boxRatio;
+        sX = (imgW - sW) / 2;
+        sY = 0;
+      } else {
+        sW = imgW;
+        sH = sW / boxRatio;
+        sX = 0;
+        sY = (imgH - sH) / 2;
+      }
+      ctx.drawImage(avatarLoadedImg, sX, sY, sW, sH, photoX, photoY, photoW, photoH);
     } else {
-      ctx.fillStyle = "#222228";
-      ctx.fillRect(avX - avR, avY - avR, avR * 2, avR * 2);
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 140px 'Syne', sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("HR", avX, avY);
+      // Fallback dark gradient while image loads
+      const placeholderGrad = ctx.createLinearGradient(photoX, photoY, photoX + photoW, photoY + photoH);
+      placeholderGrad.addColorStop(0, "#1f1f26");
+      placeholderGrad.addColorStop(1, "#121216");
+      ctx.fillStyle = placeholderGrad;
+      ctx.fillRect(photoX, photoY, photoW, photoH);
     }
+
+    // Inner subtle vignette on the photo edges
+    const vigGrad = ctx.createLinearGradient(0, photoY, 0, photoY + photoH);
+    vigGrad.addColorStop(0, "rgba(0, 0, 0, 0.18)");
+    vigGrad.addColorStop(0.12, "transparent");
+    vigGrad.addColorStop(0.88, "transparent");
+    vigGrad.addColorStop(1, "rgba(0, 0, 0, 0.32)");
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(photoX, photoY, photoW, photoH);
+
     ctx.restore();
 
-    // Avatar border ring
+    // Outer photo frame border
     ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.arc(avX, avY, avR, 0, Math.PI * 2);
+    ctx.lineWidth = 4;
+    roundRect(ctx, photoX, photoY, photoW, photoH, photoR);
     ctx.stroke();
 
-    // Green Online Badge on Avatar
-    const statusX = avX + avR * 0.65, statusY = avY + avR * 0.65;
-    ctx.fillStyle = "#22c55e";
-    ctx.beginPath();
-    ctx.arc(statusX, statusY, 24, 0, Math.PI * 2);
+    // Diagonal card glass sheen specular highlight
+    const sheenGrad = ctx.createLinearGradient(photoX, photoY, photoX + photoW, photoY + photoH);
+    sheenGrad.addColorStop(0, "rgba(255, 255, 255, 0.1)");
+    sheenGrad.addColorStop(0.35, "rgba(255, 255, 255, 0.02)");
+    sheenGrad.addColorStop(0.5, "transparent");
+    sheenGrad.addColorStop(0.75, "rgba(255, 255, 255, 0.02)");
+    sheenGrad.addColorStop(1, "rgba(255, 255, 255, 0.05)");
+    ctx.fillStyle = sheenGrad;
+    roundRect(ctx, photoX, photoY, photoW, photoH, photoR);
     ctx.fill();
-    ctx.strokeStyle = "#101012";
-    ctx.lineWidth = 6;
-    ctx.stroke();
-
-    // Name & Role (Y: 760 to 920)
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "800 68px 'Syne', sans-serif";
-    ctx.fillText("HAFIL RAZAK", W / 2, 790);
-
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-    ctx.font = "500 26px 'DM Mono', monospace";
-    ctx.fillText("SOFTWARE DEVELOPER • CSE", W / 2, 840);
-
-    // Separator line
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(80, 890);
-    ctx.lineTo(W - 80, 890);
-    ctx.stroke();
-
-    // Tech Tags row (Y: 930 to 1020)
-    const pills = ["AI / ML", "FULL STACK", "OPEN SOURCE"];
-    const pillW = 260, pillH = 64, gap = 30;
-    const startPillX = (W - (pills.length * pillW + (pills.length - 1) * gap)) / 2;
-    pills.forEach((p, i) => {
-      const px = startPillX + i * (pillW + gap);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
-      roundRect(ctx, px, 940, pillW, pillH, 32);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-      ctx.font = "600 24px 'DM Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(p, px + pillW / 2, 980);
-    });
-
-    // Bio / Description block (Y: 1040 to 1240)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
-    roundRect(ctx, 70, 1040, W - 140, 200, 32);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
-    ctx.font = "400 26px 'Syne', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Crafting modern web apps & tools with high", W / 2, 1110);
-    ctx.fillText("reliability, clean code, and intuitive UX.", W / 2, 1160);
-    ctx.fillText("Open to full-time & freelance projects.", W / 2, 1210);
-
-    // Bottom Meta Bar (Y: 1300 to 1520)
-    ctx.textAlign = "left";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-    ctx.font = "bold 28px 'DM Mono', monospace";
-    ctx.fillText("#8842-ACTIVE", 80, 1400);
-
-    // Verified badge
-    ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
-    roundRect(ctx, 80, 1430, 190, 52, 26);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(16, 185, 129, 0.35)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.fillStyle = "#10b981";
-    ctx.font = "bold 22px 'DM Mono', monospace";
-    ctx.fillText("✓ VERIFIED", 106, 1464);
-
-    // Stylized Barcode on bottom right
-    const barX = W - 280, barY = 1380, barH = 100;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-    const barWidths = [4, 12, 6, 16, 8, 4, 14, 8, 18, 4, 8, 12, 6, 14, 4, 10, 16, 8];
-    let curBx = barX;
-    barWidths.forEach(bw => {
-      ctx.fillRect(curBx, barY, bw, barH);
-      curBx += bw + 6;
-    });
   }
 
   // Back Texture Canvas
@@ -657,57 +594,67 @@ document.addEventListener("keydown", e => {
     roundRect(ctx, 16, 16, W - 32, H - 32, 64);
     ctx.fill();
 
-    // Border
+    // Outer Border
     ctx.strokeStyle = "rgba(255, 255, 255, 0.14)";
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 8;
     roundRect(ctx, 20, 20, W - 40, H - 40, 60);
     ctx.stroke();
 
+    // Top punch slot hole (matching front)
+    const holeW = 130, holeH = 28, holeR = 14;
+    const holeX = (W - holeW) / 2, holeY = 52;
+    ctx.fillStyle = "#070709";
+    roundRect(ctx, holeX, holeY, holeW, holeH, holeR);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+    ctx.lineWidth = 3;
+    roundRect(ctx, holeX, holeY, holeW, holeH, holeR);
+    ctx.stroke();
+
     // Dot grid texture
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
-    for (let x = 60; x < W - 60; x += 36) {
-      for (let y = 60; y < H - 60; y += 36) {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
+    for (let x = 64; x < W - 64; x += 36) {
+      for (let y = 120; y < H - 80; y += 36) {
         ctx.beginPath();
         ctx.arc(x, y, 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Holographic horizontal security ribbon
-    const holoGrad = ctx.createLinearGradient(0, 680, W, 780);
-    holoGrad.addColorStop(0, "rgba(236, 72, 153, 0.25)");
-    holoGrad.addColorStop(0.25, "rgba(168, 85, 247, 0.25)");
-    holoGrad.addColorStop(0.5, "rgba(59, 130, 246, 0.25)");
-    holoGrad.addColorStop(0.75, "rgba(16, 185, 129, 0.25)");
-    holoGrad.addColorStop(1, "rgba(234, 179, 8, 0.25)");
+    // Holographic horizontal security foil ribbon (Iridescent color, ZERO text)
+    const holoGrad = ctx.createLinearGradient(0, 680, W, 860);
+    holoGrad.addColorStop(0, "rgba(236, 72, 153, 0.32)");
+    holoGrad.addColorStop(0.25, "rgba(168, 85, 247, 0.32)");
+    holoGrad.addColorStop(0.5, "rgba(59, 130, 246, 0.32)");
+    holoGrad.addColorStop(0.75, "rgba(16, 185, 129, 0.32)");
+    holoGrad.addColorStop(1, "rgba(234, 179, 8, 0.32)");
     ctx.fillStyle = holoGrad;
-    ctx.fillRect(20, 680, W - 40, 140);
+    ctx.fillRect(20, 680, W - 40, 180);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-    ctx.font = "bold 32px 'DM Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("✦ HAFIL RAZAK // VERIFIED DEV SPECIFICATION ✦", W / 2, 762);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(20, 680, W - 40, 180);
 
-    // Large Monogram "HR" in center
-    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
-    ctx.font = "800 240px 'Syne', sans-serif";
-    ctx.fillText("HR", W / 2, 520);
-
-    // NFC Wireless Icon
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
-    ctx.lineWidth = 6;
-    for (let r = 30; r <= 90; r += 24) {
+    // Geometric NFC wave arcs (Minimalist smart card symbol, ZERO text)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+    ctx.lineWidth = 5;
+    for (let r = 40; r <= 136; r += 32) {
       ctx.beginPath();
-      ctx.arc(W / 2, 1100, r, -Math.PI * 0.75, -Math.PI * 0.25);
+      ctx.arc(W / 2, 1140, r, -Math.PI * 0.75, -Math.PI * 0.25);
       ctx.stroke();
     }
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-    ctx.font = "600 22px 'DM Mono', monospace";
-    ctx.fillText("CONTACTLESS DEV ID", W / 2, 1180);
+    ctx.beginPath();
+    ctx.arc(W / 2, 1140, 10, 0, Math.PI * 2);
+    ctx.fill();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-    ctx.font = "400 20px 'DM Mono', monospace";
-    ctx.fillText("PROPERTY OF HAFIL RAZAK // GITHUB.COM/HAFILRAZZ", W / 2, 1480);
+    // Geometric micro-circuit traces (Abstract tech lines, ZERO text)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(100, 1400); ctx.lineTo(340, 1400); ctx.lineTo(390, 1450); ctx.lineTo(W - 100, 1450);
+    ctx.moveTo(100, 1460); ctx.lineTo(280, 1460); ctx.lineTo(330, 1510); ctx.lineTo(W - 100, 1510);
+    ctx.stroke();
   }
 
   renderFrontTexture(frontCtx);
@@ -1190,3 +1137,55 @@ renderProjects();
 renderTechStack();
 loadComments();
 loadGitHubRepos();
+
+// ============================================================================
+// Navigation Bar Controller (Mobile menu toggle & Scroll-Spy Active Links)
+// ============================================================================
+(() => {
+  const navToggle = document.getElementById("navToggle");
+  const navMenu = document.getElementById("navMenu");
+  const navLinks = document.querySelectorAll(".nav-menu .nav-link");
+  const sections = ["home", "portfolio", "contact"]
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  if (navToggle && navMenu) {
+    navToggle.addEventListener("click", () => {
+      const isOpen = navMenu.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", () => {
+        navMenu.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  function updateActiveNav() {
+    const scrollY = window.scrollY;
+    let currentId = "home";
+
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 140;
+      const height = sec.offsetHeight;
+      if (scrollY >= top && scrollY < top + height) {
+        currentId = sec.id;
+      }
+    });
+
+    navLinks.forEach(link => {
+      const href = link.getAttribute("href") || "";
+      if (href === `#${currentId}`) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", updateActiveNav, { passive: true });
+  updateActiveNav();
+})();
+
